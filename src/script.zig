@@ -174,6 +174,7 @@ fn tick() void {
         g.iSPInitBitset.BEAST_LAST_PEYOTE_DAY != 7 or
         playerModel != Joaat.joaat("IG_ORLEANS"))
     {
+        g.iSPInitBitset.BEAST_Call_Made = false;
         return;
     }
 
