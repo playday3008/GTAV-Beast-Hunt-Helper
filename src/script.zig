@@ -166,7 +166,6 @@ fn tick() void {
         // Get current Beast Hunt path nodes
         .sBHPath = @ptrCast(ScriptHookV.getGlobalPtr(gp.sBHPath)),
     };
-    //g.iSPInitBitset.print();
 
     if (!g.iSPInitBitset.BEAST_PEYOTES_COLLECTED or
         g.iSPInitBitset.BEAST_HUNT_COMPLETED or
