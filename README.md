@@ -1,7 +1,7 @@
-# GTA V Beast Hunt Helper
+# GTA V Beast/Yeti/Sasquatch/Bigfoot Hunt Helper
 
 Mod for Grand Theft Auto V that will draw a line from player to target checkpoint through path nodes.
-So you would not need to use your hearing abilities to find path nodes.
+So you would not need to use your hearing abilities to find path nodes anymore.
 
 ## Building
 
