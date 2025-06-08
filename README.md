@@ -22,6 +22,11 @@ So you would not need to use your hearing abilities to find path nodes.
    - Red line is the path from last path node or player to the checkpoint.
 7. Just follow the line that originates from the player.
 
+## Tips
+
+Beast script is very *fragile* don't do nothing unusual, just follow the line and that's all.
+This mod can't track script state as it isn't stored in global variable, so mod have it's own state which can desync from game script, if anything unexpected happens.
+
 ## Contributing
 
 Feel free to open issues or pull requests if you have any suggestions or improvements.
