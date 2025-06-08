@@ -184,6 +184,9 @@ fn tick() void {
         return;
     }
 
+    // Disable ability to enter vehicles
+    Natives.Player.setPlayerMayNotEnterAnyVehicle(player);
+
     // Update current checkpoint and nodes if they have changed
     if (currentCheckpoint != g.iSPInitBitset.BEAST_CURRENT_CHECKPOINT or
         nextCheckpoint != g.iSPInitBitset.BEAST_Next_CHECKPOINT)
@@ -237,8 +240,7 @@ fn tick() void {
     {
         if (currentNodes.first) |first| {
             const dist = Natives.Builtin.vdist2(playerPos, first.data.*);
-            if (dist < PATH_NODE_RADIUS and // Tight radius check, just to be sure
-                Natives.Ped.isPedInAnyVehicle(playerPed, w.TRUE) == w.FALSE) // Just to be sure
+            if (dist < PATH_NODE_RADIUS) // Tight radius check, just to be sure
             {
                 root.arena.allocator().destroy(currentNodes.popFirst().?);
                 std.log.debug(
