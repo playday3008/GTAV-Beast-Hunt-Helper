@@ -16,7 +16,7 @@ So you would not need to use your hearing abilities to find path nodes anymore.
 3. Copy `BeastHuntHelper.dll` to root of your GTA V installation directory, and change extension to `.asi` (e.g. `BeastHuntHelper.asi`).
 4. Start the game.
 5. Eat last golden peyote on Saturday between 5:30 AM and 8:00 AM when the weather is foggy.
-6. You'll see yellow, green and red lines on the map.
+6. You'll see yellow, green and red lines on the screen.
    - Yellow line is the path to the next path node.
    - Green line is the path between path nodes.
    - Red line is the path from last path node or player to the checkpoint.
