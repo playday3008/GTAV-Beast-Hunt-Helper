@@ -2,20 +2,6 @@ const std = @import("std");
 
 pub const Joaat = u32;
 
-// std.ascii.isUpper is not comptime
-inline fn isUpper(comptime c: u8) bool {
-    return switch (c) {
-        'A'...'Z' => true,
-        else => false,
-    };
-}
-
-// std.ascii.toLower is not comptime
-inline fn toLower(comptime c: u8) u8 {
-    const mask = @as(u8, @intFromBool(isUpper(c))) << 5;
-    return c | mask;
-}
-
 /// Jenkins One-at-a-Time Hash (with salt)
 ///
 /// Reference: http://burtleburtle.net/bob/hash/doobs.html
@@ -26,7 +12,7 @@ pub fn joaatWithSalt(
     comptime var hash: Joaat = salt;
 
     inline for (str) |c| {
-        hash +%= toLower(c);
+        hash +%= comptime std.ascii.toLower(c);
         hash +%= (hash << 10);
         hash ^= (hash >> 6);
     }
