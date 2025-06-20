@@ -3,10 +3,10 @@ const w = std.os.windows;
 
 const root = @import("root");
 
-const ScriptHookV = @import("natives/ScriptHookV.zig");
-const Natives = @import("natives/natives.zig");
-const Enums = @import("natives/enums.zig");
-const Types = @import("natives/types.zig");
+const ScriptHookV = @import("ScriptHookV");
+const Enums = ScriptHookV.Enums;
+const Types = ScriptHookV.Types;
+const Natives = @import("natives.zig");
 
 const Joaat = @import("joaat.zig");
 

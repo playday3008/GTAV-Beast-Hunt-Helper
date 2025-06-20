@@ -7,8 +7,9 @@
 
 const windows = @import("std").os.windows;
 
-const invoker = @import("invoker.zig");
-const types = @import("types.zig");
+const ScriptHookV = @import("ScriptHookV");
+const invoker = ScriptHookV.Invoker;
+const types = ScriptHookV.Types;
 
 // zig fmt: off
 

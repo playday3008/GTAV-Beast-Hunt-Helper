@@ -46,8 +46,18 @@ pub fn build(b: *std.Build) !void {
         .root_module = lib_mod,
     });
 
-    // Link ScriptHookV, which is a required dependency for this library.
-    lib.addObjectFile(b.path("src/natives/ScriptHookV.lib"));
+    // ZigScriptHookV is a dependency that provides the ScriptHookV API for Zig.
+    const script_hook_v = b.dependency(
+        "ZigScriptHookV",
+        .{
+            .target = target,
+            .optimize = optimize,
+        },
+    );
+    lib.root_module.addImport(
+        "ScriptHookV",
+        script_hook_v.module("ZigScriptHookV"),
+    );
 
     // This declares intent for the library to be installed into the standard
     // location when the user invokes the "install" step (the default step when

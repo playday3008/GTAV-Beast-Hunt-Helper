@@ -1,7 +1,7 @@
 const std = @import("std");
 const windows = @import("std").os.windows;
 
-const ScriptHookV = @import("natives/ScriptHookV.zig");
+const ScriptHookV = @import("ScriptHookV");
 
 const script = @import("script.zig");
 
