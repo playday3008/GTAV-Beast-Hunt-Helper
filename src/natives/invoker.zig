@@ -1,5 +1,3 @@
-const windows = @import("std").os.windows;
-
 const ScriptHookV = @import("ScriptHookV.zig");
 
 pub inline fn nativePush(comptime T: type, val: T) void {

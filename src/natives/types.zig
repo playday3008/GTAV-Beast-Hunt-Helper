@@ -1,10 +1,10 @@
 const std = @import("std");
-const windows = std.os.windows;
+const w = std.os.windows;
 
-pub const Void = windows.DWORD;
-pub const Any = windows.DWORD;
-pub const uint = windows.DWORD;
-pub const Hash = windows.DWORD;
+pub const Void = w.DWORD;
+pub const Any = w.DWORD;
+pub const uint = w.DWORD;
+pub const Hash = w.DWORD;
 
 pub const Blip = c_int;
 pub const Cam = c_int;

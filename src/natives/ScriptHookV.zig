@@ -14,7 +14,7 @@ const windows = @import("std").os.windows;
 /// Texture deletion is performed automatically when game reloads scripts
 ///
 /// Can be called only in the same thread as natives
-pub fn createTexture(texFileName: [*]const u8) callconv(.c) c_int {
+pub fn createTexture(texFileName: [*:0]const u8) callconv(.c) c_int {
     const func = @extern(
         *const @TypeOf(createTexture),
         .{
