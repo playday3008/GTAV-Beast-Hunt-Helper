@@ -100,32 +100,39 @@ pub fn scriptMain() callconv(.c) void {
         .VER_1_0_3095_0 => .{
             .iSPInitBitset = 114370 + 10019 + 25,
             .vBHCheckpoints = 111121,
-            .iBHPathIndexes = 111717,
-            .sBHPath = 111850,
+            .iBHPathIndexes = 111121 + 463,
+            .sBHPath = 111121 + 463 + 266,
         },
         .VER_1_0_3179_0 => .{
             .iSPInitBitset = 114372 + 10019 + 25,
             .vBHCheckpoints = 111121,
-            .iBHPathIndexes = 111584,
-            .sBHPath = 111850,
+            .iBHPathIndexes = 111121 + 463,
+            .sBHPath = 111121 + 463 + 266,
         },
         .VER_1_0_3258_0, .VER_1_0_3323_0 => .{
             .iSPInitBitset = 113969 + 10019 + 25,
             .vBHCheckpoints = 110718,
-            .iBHPathIndexes = 111181,
-            .sBHPath = 111447,
+            .iBHPathIndexes = 110718 + 463,
+            .sBHPath = 110718 + 463 + 266,
         },
         .VER_1_0_3407_0, .VER_1_0_3504_0 => .{
             .iSPInitBitset = 114135 + 10020 + 25,
             .vBHCheckpoints = 110884,
-            .iBHPathIndexes = 111347,
-            .sBHPath = 111613,
+            .iBHPathIndexes = 110884 + 463,
+            .sBHPath = 110884 + 463 + 266,
         },
+        // Source: me
         .VER_EN_1_0_814_9 => .{
-            .iSPInitBitset = 124207,
+            .iSPInitBitset = 114212 + 10020 + 25,
             .vBHCheckpoints = 110911,
-            .iBHPathIndexes = 111374,
-            .sBHPath = 111640,
+            .iBHPathIndexes = 110911 + 463,
+            .sBHPath = 110911 + 463 + 266,
+        },
+        .VER_EN_1_0_889_15 => .{
+            .iSPInitBitset = 114420 + 10020 + 25,
+            .vBHCheckpoints = 111119,
+            .iBHPathIndexes = 111119 + 463,
+            .sBHPath = 111119 + 463 + 266,
         },
         else => {
             std.log.err("Unsupported game version: {any}", .{
