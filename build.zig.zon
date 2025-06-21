@@ -37,8 +37,8 @@
     // internet connectivity.
     .dependencies = .{
         .ZigScriptHookV = .{
-            .url = "git+https://github.com/playday3008/ZigScriptHookV.git#18c3e8ee0194b12978eee6edc86892f117f3c229",
-            .hash = "ZigScriptHookV-0.0.0-lcOjpJUsAQCrE4fcAI-wezA45hS1XwhXvOeIRfe5R2fW",
+            .url = "git+https://github.com/playday3008/ZigScriptHookV.git#42ab63c9b3b81ada081abbbe8d5e6e7b687bc2c2",
+            .hash = "ZigScriptHookV-0.0.0-lcOjpOksAQCbdGqaSSAxG9OsgzVFxb0L_lzouCUfTa2u",
         },
     },
     .paths = .{
