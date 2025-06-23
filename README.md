@@ -16,11 +16,16 @@ So you would not need to use your hearing abilities to find path nodes anymore.
 3. Copy `BeastHuntHelper.dll` to root of your GTA V installation directory, and change extension to `.asi` (e.g. `BeastHuntHelper.asi`).
 4. Start the game.
 5. Eat last golden peyote on Saturday between 5:30 AM and 8:00 AM when the weather is foggy.
-6. You'll see yellow, green and red lines on the screen.
-   - Yellow line is the path to the next path node.
-   - Green line is the path between path nodes.
-   - Red line is the path from last path node or player to the checkpoint.
-7. Just follow the line that originates from the player.
+6. Now you'll:
+   - See a couple of colored lines on the screen:
+      - <span style="color:yellow">Yellow</span> - line from current checkpoint to the first path node.
+      - <span style="color:green">Green</span> - line between path nodes.
+      - <span style="color:red">Red</span> - line from last path node to the next checkpoint.
+      - <span style="color:cyan">Cyan</span> - line from player to the next path node (that's what you should follow).
+      - <span style="color:orange">Orange</span> - line from player to the next checkpoint (that's what you should follow after all path nodes are done).
+   - Meet a couple of spheres:
+      - <span style="color:cyan">Cyan</span> - next path node (that's where you need to go).
+      - <span style="color:orange">Orange</span> - next checkpoint (that's where you need to go after path nodes are done).
 
 ## Tips
 
@@ -31,4 +36,4 @@ This mod can't track script state as it isn't stored in global variable, so mod 
 
 Feel free to open issues or pull requests if you have any suggestions or improvements.
 
-But remember: [Talk is cheap, send patches.](https://x.com/FFmpeg/status/1762805900035686805)
+But remember: [Talk is cheap, send patches.](https://fxtwitter.com/FFmpeg/status/1762805900035686805)

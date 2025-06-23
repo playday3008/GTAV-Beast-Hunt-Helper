@@ -6,16 +6,19 @@ const root = @import("root");
 const ScriptHookV = @import("ScriptHookV");
 const Enums = ScriptHookV.Enums;
 const Types = ScriptHookV.Types;
+const Joaat = ScriptHookV.Joaat;
 const Natives = @import("natives.zig");
 
-const Joaat = @import("joaat.zig");
-
-var rand: std.Random.DefaultPrng = undefined;
-
+// Constants
 const CHECKPOINT_COUNT = 11;
 const MAX_PATH_COUNT = 64;
 const NODES_PER_PATH = 4;
 const PATH_NODE_RADIUS = 17.0;
+
+// As path state is stored here,
+// reloading the script will reset path between checkpoints
+// but not the checkpoints themselves.
+var visitedPathsNodes: [MAX_PATH_COUNT][NODES_PER_PATH]?bool = undefined;
 
 var gp: struct {
     iSPInitBitset: c_int,
@@ -93,35 +96,9 @@ var g: struct {
 } = undefined;
 
 pub fn scriptMain() callconv(.c) void {
-    rand = std.Random.DefaultPrng.init(@intCast(std.time.milliTimestamp()));
-
     gp = switch (ScriptHookV.getGameVersion()) {
         // Source: https://github.com/calamity-inc/GTA-V-Decompiled-Scripts
-        .VER_1_0_3095_0 => .{
-            .iSPInitBitset = 114370 + 10019 + 25,
-            .vBHCheckpoints = 111121,
-            .iBHPathIndexes = 111121 + 463,
-            .sBHPath = 111121 + 463 + 266,
-        },
-        .VER_1_0_3179_0 => .{
-            .iSPInitBitset = 114372 + 10019 + 25,
-            .vBHCheckpoints = 111121,
-            .iBHPathIndexes = 111121 + 463,
-            .sBHPath = 111121 + 463 + 266,
-        },
-        .VER_1_0_3258_0, .VER_1_0_3323_0 => .{
-            .iSPInitBitset = 113969 + 10019 + 25,
-            .vBHCheckpoints = 110718,
-            .iBHPathIndexes = 110718 + 463,
-            .sBHPath = 110718 + 463 + 266,
-        },
-        .VER_1_0_3407_0, .VER_1_0_3504_0 => .{
-            .iSPInitBitset = 114135 + 10020 + 25,
-            .vBHCheckpoints = 110884,
-            .iBHPathIndexes = 110884 + 463,
-            .sBHPath = 110884 + 463 + 266,
-        },
-        // Source: me
+        // Source: Me
         .VER_EN_1_0_814_9 => .{
             .iSPInitBitset = 114162 + 10020 + 25,
             .vBHCheckpoints = 110911,
@@ -142,29 +119,12 @@ pub fn scriptMain() callconv(.c) void {
         },
     };
 
-    while (true) {
-        tick();
-        ScriptHookV.wait(0);
+    // Nullify visited paths nodes
+    for (&visitedPathsNodes) |*path| {
+        for (path) |*node| {
+            node.* = null;
+        }
     }
-}
-
-// As path state is stored here,
-// reloading the script will reset path between checkpoints
-// but not the checkpoints themselves.
-var currentCheckpoint: u4 = 0;
-var nextCheckpoint: u4 = 0;
-var currentNodes: std.DoublyLinkedList(*const Types.Vector3) = .{};
-var callTick: i64 = 0;
-var dumpTick: i64 = 0;
-
-var dumpGlobalsOnce = std.once(dumpGlobals);
-
-fn tick() void {
-    // Get player ped and position
-    const player = Natives.Player.playerId();
-    const playerPed = Natives.Player.playerPedId();
-    const playerModel = Natives.Entity.getEntityModel(playerPed);
-    const playerPos = Natives.Entity.getEntityCoords(playerPed, w.TRUE);
 
     g = .{
         // Get current Single Player bitset
@@ -177,20 +137,37 @@ fn tick() void {
         .sBHPath = @ptrCast(ScriptHookV.getGlobalPtr(gp.sBHPath)),
     };
 
-    // Dump globals every 2.5 seconds
-    //if ((std.time.milliTimestamp() - dumpTick) >= 2500) {
-    //    dumpTick = std.time.milliTimestamp();
-    //    dumpGlobals();
-    //}
-    dumpGlobalsOnce.call();
+    // Fill visited nodes paths with false where node exists
+    for (g.sBHPath.data, 0..) |path, i| {
+        for (0..path.length) |j| {
+            const node = &visitedPathsNodes[i][j];
+            if (node.* == null) {
+                node.* = false;
+            }
+        }
+    }
+
+    dumpGlobals();
+
+    while (true) {
+        update();
+        ScriptHookV.wait(0);
+    }
+}
+
+fn update() void {
+    // Get player ped and position
+    const player = Natives.Player.playerId();
+    const playerPed = Natives.Player.playerPedId();
+    const playerModel = Natives.Entity.getEntityModel(playerPed);
+    const playerPos = Natives.Entity.getEntityCoords(playerPed, w.TRUE);
 
     if (!g.iSPInitBitset.BEAST_PEYOTES_COLLECTED or
         g.iSPInitBitset.BEAST_HUNT_COMPLETED or
         g.iSPInitBitset.BEAST_KILLED_AND_UNLOCKED or
         g.iSPInitBitset.BEAST_LAST_PEYOTE_DAY != 7 or
-        playerModel != Joaat.joaat("IG_ORLEANS"))
+        playerModel != Joaat.atStringHash(u32, "IG_ORLEANS"))
     {
-        g.iSPInitBitset.BEAST_CALL_MADE = false;
         return;
     }
 
@@ -201,125 +178,137 @@ fn tick() void {
         return;
     }
 
-    // Disable ability to enter vehicles
-    Natives.Player.setPlayerMayNotEnterAnyVehicle(player);
-
-    // Update current checkpoint and nodes if they have changed
-    if (currentCheckpoint != g.iSPInitBitset.BEAST_CURRENT_CHECKPOINT or
-        nextCheckpoint != g.iSPInitBitset.BEAST_NEXT_CHECKPOINT)
     {
-        currentCheckpoint = g.iSPInitBitset.BEAST_CURRENT_CHECKPOINT;
-        nextCheckpoint = g.iSPInitBitset.BEAST_NEXT_CHECKPOINT;
+        const index: usize = @intCast(g.iBHPathIndexes.data[g.iSPInitBitset.BEAST_CURRENT_CHECKPOINT].data[g.iSPInitBitset.BEAST_NEXT_CHECKPOINT]);
+        const path = g.sBHPath.data[index];
+        const visitedNodes = &visitedPathsNodes[index];
 
-        std.log.info("Checkpoint updated: {d} -> {d}", .{
-            currentCheckpoint,
-            nextCheckpoint,
-        });
-
-        // Clear current nodes if next checkpoint changes
+        // Draw path from current to next checkpoint
+        // through all nodes
         {
-            while (currentNodes.pop()) |node| {
-                root.arena.allocator().destroy(node);
-            }
-            currentNodes = .{};
-        }
-
-        // Get path nodes between current and next checkpoint
-        const path = g.iBHPathIndexes.data[currentCheckpoint].data[nextCheckpoint];
-        const nodes = g.sBHPath.data[@intCast(path)].nodes;
-
-        for (&nodes) |*node| {
-            if (node.x == 0 and node.y == 0 and node.z == 0) {
-                continue; // Skip zero coordinates
-            }
-
-            if (std.meta.eql(node.*, g.vBHCheckpoints.data[nextCheckpoint])) {
-                continue; // Skip if node is the next checkpoint
-            }
-
-            const new = @TypeOf(currentNodes).Node{
-                .data = node,
-            };
-            const newAllocated = root.arena.allocator().create(@TypeOf(new)) catch |err| {
-                std.log.err("Failed to allocate memory for new node: {any}", .{err});
-                return;
-            };
-            newAllocated.* = new;
-            currentNodes.append(newAllocated);
-            std.log.debug(
-                "Added node: ({d:>7.2}, {d:>7.2}, {d:>6.2})",
-                .{ node.x, node.y, node.z },
-            );
-        }
-    }
-
-    // Pop nodes that are marked as reached
-    {
-        if (currentNodes.first) |first| {
-            const dist = Natives.Builtin.vdist2(playerPos, first.data.*);
-            if (dist < PATH_NODE_RADIUS) // Tight radius check, just to be sure
-            {
-                root.arena.allocator().destroy(currentNodes.popFirst().?);
-                std.log.debug(
-                    "Reached node, removing: ({d:>7.2}, {d:>7.2}, {d:>6.2})",
-                    .{ first.data.x, first.data.y, first.data.z },
-                );
-            }
-        }
-    }
-
-    // Draw lines from player to current checkpoint through nodes
-    {
-        if (currentNodes.first) |first| {
+            // Current checkpoint to first node
             Natives.Graphics.drawLine(
-                playerPos,
-                first.data.*,
+                g.vBHCheckpoints.data[g.iSPInitBitset.BEAST_CURRENT_CHECKPOINT],
+                path.nodes[0],
                 255,
                 255,
                 0,
                 255,
             );
 
-            var item = currentNodes.first;
-            while (item) |node| : (item = node.next) {
-                if (node.next) |next| {
-                    Natives.Graphics.drawLine(
-                        node.data.*,
-                        next.data.*,
-                        0,
-                        255,
-                        0,
-                        255,
-                    );
+            // Last node to next checkpoint
+            Natives.Graphics.drawLine(
+                path.nodes[path.length - 1],
+                g.vBHCheckpoints.data[g.iSPInitBitset.BEAST_NEXT_CHECKPOINT],
+                255,
+                0,
+                0,
+                255,
+            );
+
+            // Between nodes
+            for (0..path.length - 1) |i| {
+                const node1 = path.nodes[i];
+                const node2 = path.nodes[i + 1];
+
+                Natives.Graphics.drawLine(
+                    node1,
+                    node2,
+                    0,
+                    255,
+                    0,
+                    255,
+                );
+            }
+
+            // Next checkpoint marker
+            Natives.Graphics.drawMarker(
+                28,
+                g.vBHCheckpoints.data[g.iSPInitBitset.BEAST_NEXT_CHECKPOINT],
+                .{
+                    .x = 0,
+                    .y = 0,
+                    .z = 0,
+                },
+                .{
+                    .x = 0,
+                    .y = 180,
+                    .z = 0,
+                },
+                .{
+                    .x = 2,
+                    .y = 2,
+                    .z = 2,
+                },
+                255,
+                255 / 2,
+                0,
+                255 / 4,
+                0,
+                1,
+                1,
+                0,
+                null,
+                null,
+                0,
+            );
+
+            // Draw line from player to next checkpoint
+            Natives.Graphics.drawLine(
+                playerPos,
+                g.vBHCheckpoints.data[g.iSPInitBitset.BEAST_NEXT_CHECKPOINT],
+                255,
+                255 / 2,
+                0,
+                255,
+            );
+        }
+
+        // Draw line and sphere to first unvisited node
+        {
+            for (0..path.length) |i| {
+                const node = path.nodes[i];
+
+                if (visitedNodes[i]) |visited| {
+                    if (!visited) {
+
+                        // Mark node as visited when player is close enough
+                        const dist = Natives.Builtin.vdist2(playerPos, node);
+                        if (dist < PATH_NODE_RADIUS) // Tight radius check, just to be sure
+                        {
+                            visitedNodes[i] = true;
+                            std.log.debug(
+                                "Visited: ({d:>8.3}, {d:>8.3}, {d:>7.3})",
+                                .{ node.x, node.y, node.z },
+                            );
+                        }
+
+                        // Draw sphere to first unvisited node
+                        Natives.Graphics.drawMarkerSphere(
+                            node,
+                            comptime std.math.sqrt(PATH_NODE_RADIUS),
+                            0,
+                            255,
+                            255,
+                            1.0 / 3.0,
+                        );
+
+                        // Draw line to first unvisited node
+                        Natives.Graphics.drawLine(
+                            playerPos,
+                            node,
+                            0,
+                            255,
+                            255,
+                            255,
+                        );
+
+                        // Exit after first unvisited node
+                        break;
+                    }
                 }
             }
         }
-
-        if (currentNodes.last) |last| {
-            Natives.Graphics.drawLine(
-                last.data.*,
-                g.vBHCheckpoints.data[nextCheckpoint],
-                255,
-                0,
-                0,
-                255,
-            );
-        } else {
-            Natives.Graphics.drawLine(
-                playerPos,
-                g.vBHCheckpoints.data[nextCheckpoint],
-                255,
-                0,
-                0,
-                255,
-            );
-        }
-    }
-
-    // Call the Beast every 10 seconds
-    if ((std.time.milliTimestamp() - callTick) >= 10000) {
-        callTick = std.time.milliTimestamp();
-        g.iSPInitBitset.BEAST_CALL_MADE = true;
     }
 }
 
@@ -374,7 +363,13 @@ fn dumpGlobals() void {
         for (g.iBHPathIndexes.data, 0..) |checkpoint, i| {
             std.debug.print("      {d:2}: [ ", .{i});
             for (checkpoint.data) |pathIndex| {
-                std.debug.print("{d:3}, ", .{@as(i32, @truncate(pathIndex))});
+                if (@as(i32, @truncate(pathIndex)) == -1) {
+                    std.debug.print("  ?, ", .{});
+                } else {
+                    std.debug.print("{d:3}, ", .{
+                        @as(i32, @truncate(pathIndex)),
+                    });
+                }
             }
             std.debug.print("], ({d})\n", .{checkpoint.size});
         }
