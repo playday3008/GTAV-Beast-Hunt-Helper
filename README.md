@@ -18,14 +18,14 @@ So you would not need to use your hearing abilities to find path nodes anymore.
 5. Eat last golden peyote on Saturday between 5:30 AM and 8:00 AM when the weather is foggy.
 6. Now you'll:
    - See a couple of colored lines on the screen:
-      - <span style="color:yellow">Yellow</span> - line from current checkpoint to the first path node.
-      - <span style="color:green">Green</span> - line between path nodes.
-      - <span style="color:red">Red</span> - line from last path node to the next checkpoint.
-      - <span style="color:cyan">Cyan</span> - line from player to the next path node (that's what you should follow).
-      - <span style="color:orange">Orange</span> - line from player to the next checkpoint (that's what you should follow after all path nodes are done).
+      - $${\color{yellow}\textbf{Yellow}}$$ - line from current checkpoint to the first path node.
+      - $${\color{green}\textbf{Green}}$$ - line between path nodes.
+      - $${\color{red}\textbf{Red}}$$ - line from last path node to the next checkpoint.
+      - $${\color{cyan}\textbf{Cyan}}$$ - line from player to the next path node (that's what you should follow).
+      - $${\color{orange}\textbf{Orange}}$$ - line from player to the next checkpoint (that's what you should follow after all path nodes are done).
    - Meet a couple of spheres:
-      - <span style="color:cyan">Cyan</span> - next path node (that's where you need to go).
-      - <span style="color:orange">Orange</span> - next checkpoint (that's where you need to go after path nodes are done).
+      - $${\color{cyan}\textbf{Cyan}}$$ - next path node (that's where you need to go).
+      - $${\color{orange}\textbf{Orange}}$$ - next checkpoint (that's where you need to go after path nodes are done).
 
 ## Tips
 
