@@ -97,7 +97,87 @@ var g: struct {
 
 pub fn scriptMain() callconv(.c) void {
     gp = switch (ScriptHookV.getGameVersion()) {
-        // Source: https://github.com/calamity-inc/GTA-V-Decompiled-Scripts
+        // Sources:
+        // - https://github.com/calamity-inc/GTA-V-Decompiled-Scripts
+        // - https://github.com/root-cause/v-decompiled-scripts
+        .VER_1_0_2699_16 => .{
+            .iSPInitBitset = 113386 + 10016 + 25,
+            .vBHCheckpoints = 110138,
+            .iBHPathIndexes = 110138 + 463,
+            .sBHPath = 110138 + 463 + 266,
+        },
+        .VER_1_0_2802_0 => .{
+            .iSPInitBitset = 113648 + 10018 + 25,
+            .vBHCheckpoints = 110400,
+            .iBHPathIndexes = 110400 + 463,
+            .sBHPath = 110400 + 463 + 266,
+        },
+        .VER_1_0_2824_0 => .{
+            .iSPInitBitset = 113648 + 10018 + 25,
+            .vBHCheckpoints = 110400,
+            .iBHPathIndexes = 110400 + 463,
+            .sBHPath = 110400 + 463 + 266,
+        },
+        .VER_1_0_2845_0 => .{
+            .iSPInitBitset = 113648 + 10018 + 25,
+            .vBHCheckpoints = 110400,
+            .iBHPathIndexes = 110400 + 463,
+            .sBHPath = 110400 + 463 + 266,
+        },
+        .VER_1_0_2944_0 => .{
+            .iSPInitBitset = 113810 + 10019 + 25,
+            .vBHCheckpoints = 110561,
+            .iBHPathIndexes = 110561 + 463,
+            .sBHPath = 110561 + 463 + 266,
+        },
+        .VER_1_0_3095_0 => .{
+            .iSPInitBitset = 114370 + 10019 + 25,
+            .vBHCheckpoints = 111121,
+            .iBHPathIndexes = 111121 + 463,
+            .sBHPath = 111121 + 463 + 266,
+        },
+        .VER_1_0_3179_0 => .{
+            .iSPInitBitset = 114372 + 10019 + 25,
+            .vBHCheckpoints = 111121,
+            .iBHPathIndexes = 111121 + 463,
+            .sBHPath = 111121 + 463 + 266,
+        },
+        .VER_1_0_3258_0 => .{
+            .iSPInitBitset = 113969 + 10019 + 25,
+            .vBHCheckpoints = 110718,
+            .iBHPathIndexes = 110718 + 463,
+            .sBHPath = 110718 + 463 + 266,
+        },
+        .VER_1_0_3274_0 => .{
+            .iSPInitBitset = 113969 + 10019 + 25,
+            .vBHCheckpoints = 110718,
+            .iBHPathIndexes = 110718 + 463,
+            .sBHPath = 110718 + 463 + 266,
+        },
+        .VER_1_0_3323_0 => .{
+            .iSPInitBitset = 113969 + 10019 + 25,
+            .vBHCheckpoints = 110718,
+            .iBHPathIndexes = 110718 + 463,
+            .sBHPath = 110718 + 463 + 266,
+        },
+        .VER_1_0_3407_0 => .{
+            .iSPInitBitset = 114135 + 10020 + 25,
+            .vBHCheckpoints = 110884,
+            .iBHPathIndexes = 110884 + 463,
+            .sBHPath = 110884 + 463 + 266,
+        },
+        .VER_1_0_3504_0 => .{
+            .iSPInitBitset = 114135 + 10020 + 25,
+            .vBHCheckpoints = 110884,
+            .iBHPathIndexes = 110884 + 463,
+            .sBHPath = 110884 + 463 + 266,
+        },
+        .VER_1_0_3570_0 => .{
+            .iSPInitBitset = 114344 + 10020 + 25,
+            .vBHCheckpoints = 111093,
+            .iBHPathIndexes = 111093 + 463,
+            .sBHPath = 111093 + 463 + 266,
+        },
         // Source: Me
         .VER_EN_1_0_814_9 => .{
             .iSPInitBitset = 114162 + 10020 + 25,
