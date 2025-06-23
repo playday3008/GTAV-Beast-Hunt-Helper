@@ -39,8 +39,8 @@ var g: struct {
         BEAST_KILLED_AND_UNLOCKED: bool,
         BEAST_LAST_PEYOTE_DAY: u3,
         BEAST_CURRENT_CHECKPOINT: u4,
-        BEAST_Next_CHECKPOINT: u4,
-        BEAST_Call_Made: bool,
+        BEAST_NEXT_CHECKPOINT: u4,
+        BEAST_CALL_MADE: bool,
         _: u41, // Padding
 
         comptime {
@@ -123,13 +123,13 @@ pub fn scriptMain() callconv(.c) void {
         },
         // Source: me
         .VER_EN_1_0_814_9 => .{
-            .iSPInitBitset = 114212 + 10020 + 25,
+            .iSPInitBitset = 114162 + 10020 + 25,
             .vBHCheckpoints = 110911,
             .iBHPathIndexes = 110911 + 463,
             .sBHPath = 110911 + 463 + 266,
         },
         .VER_EN_1_0_889_15 => .{
-            .iSPInitBitset = 114420 + 10020 + 25,
+            .iSPInitBitset = 114370 + 10020 + 25,
             .vBHCheckpoints = 111119,
             .iBHPathIndexes = 111119 + 463,
             .sBHPath = 111119 + 463 + 266,
@@ -155,6 +155,9 @@ var currentCheckpoint: u4 = 0;
 var nextCheckpoint: u4 = 0;
 var currentNodes: std.DoublyLinkedList(*const Types.Vector3) = .{};
 var callTick: i64 = 0;
+var dumpTick: i64 = 0;
+
+var dumpGlobalsOnce = std.once(dumpGlobals);
 
 fn tick() void {
     // Get player ped and position
@@ -174,13 +177,20 @@ fn tick() void {
         .sBHPath = @ptrCast(ScriptHookV.getGlobalPtr(gp.sBHPath)),
     };
 
+    // Dump globals every 2.5 seconds
+    //if ((std.time.milliTimestamp() - dumpTick) >= 2500) {
+    //    dumpTick = std.time.milliTimestamp();
+    //    dumpGlobals();
+    //}
+    dumpGlobalsOnce.call();
+
     if (!g.iSPInitBitset.BEAST_PEYOTES_COLLECTED or
         g.iSPInitBitset.BEAST_HUNT_COMPLETED or
         g.iSPInitBitset.BEAST_KILLED_AND_UNLOCKED or
         g.iSPInitBitset.BEAST_LAST_PEYOTE_DAY != 7 or
         playerModel != Joaat.joaat("IG_ORLEANS"))
     {
-        g.iSPInitBitset.BEAST_Call_Made = false;
+        g.iSPInitBitset.BEAST_CALL_MADE = false;
         return;
     }
 
@@ -196,10 +206,10 @@ fn tick() void {
 
     // Update current checkpoint and nodes if they have changed
     if (currentCheckpoint != g.iSPInitBitset.BEAST_CURRENT_CHECKPOINT or
-        nextCheckpoint != g.iSPInitBitset.BEAST_Next_CHECKPOINT)
+        nextCheckpoint != g.iSPInitBitset.BEAST_NEXT_CHECKPOINT)
     {
         currentCheckpoint = g.iSPInitBitset.BEAST_CURRENT_CHECKPOINT;
-        nextCheckpoint = g.iSPInitBitset.BEAST_Next_CHECKPOINT;
+        nextCheckpoint = g.iSPInitBitset.BEAST_NEXT_CHECKPOINT;
 
         std.log.info("Checkpoint updated: {d} -> {d}", .{
             currentCheckpoint,
@@ -309,6 +319,95 @@ fn tick() void {
     // Call the Beast every 10 seconds
     if ((std.time.milliTimestamp() - callTick) >= 10000) {
         callTick = std.time.milliTimestamp();
-        g.iSPInitBitset.BEAST_Call_Made = true;
+        g.iSPInitBitset.BEAST_CALL_MADE = true;
     }
+}
+
+fn dumpGlobals() void {
+    const dumpSPInitBitset = true;
+    const dumpBHCheckpoints = false;
+    const dumpBHPathIndexes = false;
+    const dumpBHPath = false;
+    std.debug.print("g = {{\n", .{});
+    if (dumpSPInitBitset) {
+        std.debug.print("  iSPInitBitset: {{\n", .{});
+        std.debug.print("    INSTALL_SCREEN_FINISHED: {any},\n", .{g.iSPInitBitset.INSTALL_SCREEN_FINISHED});
+        std.debug.print("    TITLE_SEQUENCE_DISPLAYED: {any},\n", .{g.iSPInitBitset.TITLE_SEQUENCE_DISPLAYED});
+        std.debug.print("    TURN_ON_LOST_BIKER_GROUP: {any},\n", .{g.iSPInitBitset.TURN_ON_LOST_BIKER_GROUP});
+        std.debug.print("    RESTORE_SLEEP_MODE: {any},\n", .{g.iSPInitBitset.RESTORE_SLEEP_MODE});
+        std.debug.print("    LOADED_DIRECTLY_INTO_MISSION: {any},\n", .{g.iSPInitBitset.LOADED_DIRECTLY_INTO_MISSION});
+        std.debug.print("    UNLOCK_SHINE_A_LIGHT: {any},\n", .{g.iSPInitBitset.UNLOCK_SHINE_A_LIGHT});
+        std.debug.print("    SHRINK_SESSION_ATTENDED: {any},\n", .{g.iSPInitBitset.SHRINK_SESSION_ATTENDED});
+        std.debug.print("    BEAST_PEYOTES_COLLECTED: {any},\n", .{g.iSPInitBitset.BEAST_PEYOTES_COLLECTED});
+        std.debug.print("    BEAST_HUNT_COMPLETED: {any},\n", .{g.iSPInitBitset.BEAST_HUNT_COMPLETED});
+        std.debug.print("    BEAST_FIGHT_FAILED: {any},\n", .{g.iSPInitBitset.BEAST_FIGHT_FAILED});
+        std.debug.print("    BEAST_KILLED_AND_UNLOCKED: {any},\n", .{g.iSPInitBitset.BEAST_KILLED_AND_UNLOCKED});
+        std.debug.print("    BEAST_LAST_PEYOTE_DAY: {any},\n", .{g.iSPInitBitset.BEAST_LAST_PEYOTE_DAY});
+        std.debug.print("    BEAST_CURRENT_CHECKPOINT: {any},\n", .{g.iSPInitBitset.BEAST_CURRENT_CHECKPOINT});
+        std.debug.print("    BEAST_NEXT_CHECKPOINT: {any},\n", .{g.iSPInitBitset.BEAST_NEXT_CHECKPOINT});
+        std.debug.print("    BEAST_CALL_MADE: {any},\n", .{g.iSPInitBitset.BEAST_CALL_MADE});
+        std.debug.print("  }},\n", .{});
+    }
+    if (dumpBHCheckpoints) {
+        std.debug.print("  vBHCheckpoints: {{\n", .{});
+        std.debug.print("    size: {any},\n", .{g.vBHCheckpoints.size});
+        std.debug.print("    data: {{\n", .{});
+        for (g.vBHCheckpoints.data, 0..) |checkpoint, i| {
+            std.debug.print("      {d:2}: ({d:>8.3}, {d:>8.3}, {d:>7.3}),\n", .{
+                i,
+                checkpoint.x,
+                checkpoint.y,
+                checkpoint.z,
+            });
+        }
+        std.debug.print("    }},\n", .{});
+        std.debug.print("  }},\n", .{});
+    }
+    if (dumpBHPathIndexes) {
+        std.debug.print("  iBHPathIndexes: {{\n", .{});
+        std.debug.print("    size: {any}\n", .{g.iBHPathIndexes.size});
+        std.debug.print("    data: {{", .{});
+        for (g.iBHPathIndexes.data[0].data, 0..) |_, i| {
+            std.debug.print("{d:4} ", .{i});
+        }
+        std.debug.print("\n", .{});
+        for (g.iBHPathIndexes.data, 0..) |checkpoint, i| {
+            std.debug.print("      {d:2}: [ ", .{i});
+            for (checkpoint.data) |pathIndex| {
+                std.debug.print("{d:3}, ", .{@as(i32, @truncate(pathIndex))});
+            }
+            std.debug.print("], ({d})\n", .{checkpoint.size});
+        }
+        std.debug.print("    }},\n", .{});
+        std.debug.print("  }},\n", .{});
+    }
+    if (dumpBHPath) {
+        std.debug.print("  sBHPath: {{ ", .{});
+        std.debug.print("size: {any}\n", .{g.sBHPath.size});
+        std.debug.print("    data: [\n", .{});
+        for (g.sBHPath.data, 0..) |path, i| {
+            if (path.length == 0) {
+                continue; // Skip empty paths
+            }
+
+            std.debug.print("      {d}: {{ ", .{i});
+            std.debug.print("length: {d}, ", .{path.length});
+            std.debug.print("size: {d}\n", .{path.size});
+            std.debug.print("        nodes: [\n", .{});
+            for (0..path.length) |j| {
+                const node = path.nodes[j];
+                std.debug.print("          {d}: ({d:>8.3}, {d:>8.3}, {d:>7.3}),\n", .{
+                    j,
+                    node.x,
+                    node.y,
+                    node.z,
+                });
+            }
+            std.debug.print("        ],\n", .{});
+            std.debug.print("      }},\n", .{});
+        }
+        std.debug.print("    ],\n", .{});
+        std.debug.print("  }},\n", .{});
+    }
+    std.debug.print("}};\n", .{});
 }
