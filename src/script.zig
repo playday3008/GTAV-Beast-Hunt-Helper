@@ -15,12 +15,7 @@ const MAX_PATH_COUNT = 64;
 const NODES_PER_PATH = 4;
 const PATH_NODE_RADIUS = 17.0;
 
-// As path state is stored here,
-// reloading the script will reset path between checkpoints
-// but not the checkpoints themselves.
-var visitedPathsNodes: [MAX_PATH_COUNT][NODES_PER_PATH]?bool = undefined;
-
-var gp: struct {
+var g_offset: struct {
     iSPInitBitset: c_int,
     vBHCheckpoints: c_int,
     iBHPathIndexes: c_int,
@@ -96,7 +91,8 @@ var g: struct {
 } = undefined;
 
 pub fn scriptMain() callconv(.c) void {
-    gp = switch (ScriptHookV.getGameVersion()) {
+    g_offset = switch (ScriptHookV.getGameVersion()) {
+        // Legacy
         // Sources:
         // - https://github.com/calamity-inc/GTA-V-Decompiled-Scripts
         // - https://github.com/root-cause/v-decompiled-scripts
@@ -178,6 +174,7 @@ pub fn scriptMain() callconv(.c) void {
             .iBHPathIndexes = 111093 + 463,
             .sBHPath = 111093 + 463 + 266,
         },
+        // Enhanced
         // Source: Me
         .VER_EN_1_0_814_9 => .{
             .iSPInitBitset = 114162 + 10020 + 25,
@@ -199,34 +196,21 @@ pub fn scriptMain() callconv(.c) void {
         },
     };
 
-    // Nullify visited paths nodes
-    for (&visitedPathsNodes) |*path| {
-        for (path) |*node| {
-            node.* = null;
-        }
-    }
-
     g = .{
         // Get current Single Player bitset
-        .iSPInitBitset = @ptrCast(ScriptHookV.getGlobalPtr(gp.iSPInitBitset)),
+        .iSPInitBitset = @ptrCast(ScriptHookV.getGlobalPtr(g_offset.iSPInitBitset)),
         // Get current Beast Hunt checkpoints
-        .vBHCheckpoints = @ptrCast(ScriptHookV.getGlobalPtr(gp.vBHCheckpoints)),
+        .vBHCheckpoints = @ptrCast(ScriptHookV.getGlobalPtr(g_offset.vBHCheckpoints)),
         // Get current Beast Hunt path indexes
-        .iBHPathIndexes = @ptrCast(ScriptHookV.getGlobalPtr(gp.iBHPathIndexes)),
+        .iBHPathIndexes = @ptrCast(ScriptHookV.getGlobalPtr(g_offset.iBHPathIndexes)),
         // Get current Beast Hunt path nodes
-        .sBHPath = @ptrCast(ScriptHookV.getGlobalPtr(gp.sBHPath)),
+        .sBHPath = @ptrCast(ScriptHookV.getGlobalPtr(g_offset.sBHPath)),
     };
 
-    // Fill visited nodes paths with false where node exists
-    for (g.sBHPath.data, 0..) |path, i| {
-        for (0..path.length) |j| {
-            const node = &visitedPathsNodes[i][j];
-            if (node.* == null) {
-                node.* = false;
-            }
-        }
-    }
+    // Reset visited paths nodes
+    resetVisited();
 
+    // Print globals for debugging
     dumpGlobals();
 
     while (true) {
@@ -234,6 +218,11 @@ pub fn scriptMain() callconv(.c) void {
         ScriptHookV.wait(0);
     }
 }
+
+// As path state is stored here, reloading the script will reset
+// path between checkpoints but not the checkpoints themselves.
+var visitedPathsNodes: [MAX_PATH_COUNT][NODES_PER_PATH]?bool = undefined;
+var callTick: i64 = 0;
 
 fn update() void {
     // Get player ped and position
@@ -248,6 +237,8 @@ fn update() void {
         g.iSPInitBitset.BEAST_LAST_PEYOTE_DAY != 7 or
         playerModel != Joaat.atStringHash(u32, "IG_ORLEANS"))
     {
+        g.iSPInitBitset.BEAST_CALL_MADE = false;
+        resetVisited();
         return;
     }
 
@@ -387,6 +378,33 @@ fn update() void {
                         break;
                     }
                 }
+            }
+        }
+    }
+
+    // Make a call every 10 seconds
+    if (std.time.milliTimestamp() - callTick > 10_000) {
+        callTick = std.time.milliTimestamp();
+
+        // Call Beast Hunt script
+        g.iSPInitBitset.BEAST_CALL_MADE = true;
+    }
+}
+
+fn resetVisited() void {
+    // Nullify visited paths nodes
+    for (&visitedPathsNodes) |*path| {
+        for (path) |*node| {
+            node.* = null;
+        }
+    }
+
+    // Fill visited nodes paths with false where node exists
+    for (g.sBHPath.data, 0..) |path, i| {
+        for (0..path.length) |j| {
+            const node = &visitedPathsNodes[i][j];
+            if (node.* == null) {
+                node.* = false;
             }
         }
     }
