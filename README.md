@@ -29,7 +29,7 @@ So you would not need to use your hearing abilities to find path nodes anymore.
       - Meet a couple of spheres:
          - $${\color{cyan}\textbf{Cyan}}$$ - next path node (that's where you need to go).
          - $${\color{orange}\textbf{Orange}}$$ - next checkpoint (that's where you need to go after path nodes are done).
-9. Follow the cyan line to the next path nodes (the cyan sphere) and when no more path nodes are left, follow the orange line to the next checkpoint (the orange sphere).
+9. Follow the $${\color{cyan}\textbf{cyan}}$$ line to the next path nodes (the $${\color{cyan}\textbf{cyan}}$$ sphere) and when no more path nodes are left, follow the $${\color{orange}\textbf{orange}}$$ line to the next checkpoint (the $${\color{orange}\textbf{orange}}$$ sphere).
 10. If path nodes are followed correctly up to the next checkpoint, the game will automatically progress to the next checkpoint and next path nodes and checkpoints will be automatically drawn on the screen.
       - If not, try to reload save and start again from step 7 (inclusive).
       - Also check the [troubleshooting](#troubleshooting) section below.
