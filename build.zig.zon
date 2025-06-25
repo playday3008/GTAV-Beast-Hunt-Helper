@@ -36,9 +36,9 @@
     // Once all dependencies are fetched, `zig build` no longer requires
     // internet connectivity.
     .dependencies = .{
-        .ZigScriptHookV = .{
-            .url = "git+https://github.com/playday3008/ZigScriptHookV.git#13e77e8bc44a5895d38e6f41599630a3dbdeec50",
-            .hash = "ZigScriptHookV-0.0.0-lcOjpCCJAQBVhujSGQr3-4l6hL0LglYUy_yO6VyY33yp",
+        .ScriptHookZig = .{
+            .url = "git+https://github.com/playday3008/ScriptHookZig.git#ec574f4e9bda586f702d720517277cd2a48b3a4f",
+            .hash = "ScriptHookZig-0.0.0-3e3FLljQAADP2n2GjlQqM30JhBoTky9PuAlARbfRX302",
         },
     },
     .paths = .{

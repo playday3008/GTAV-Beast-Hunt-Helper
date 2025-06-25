@@ -46,17 +46,17 @@ pub fn build(b: *std.Build) !void {
         .root_module = lib_mod,
     });
 
-    // ZigScriptHookV is a dependency that provides the ScriptHookV API for Zig.
+    // ScriptHookZig is a dependency that provides the ScriptHook API for Zig.
     const script_hook_v = b.dependency(
-        "ZigScriptHookV",
+        "ScriptHookZig",
         .{
             .target = target,
             .optimize = optimize,
         },
     );
     lib.root_module.addImport(
-        "ScriptHookV",
-        script_hook_v.module("ZigScriptHookV"),
+        "ScriptHookZig",
+        script_hook_v.module("ScriptHookZig"),
     );
 
     // This declares intent for the library to be installed into the standard

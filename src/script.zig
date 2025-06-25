@@ -3,10 +3,10 @@ const w = std.os.windows;
 
 const root = @import("root");
 
-const ScriptHookV = @import("ScriptHookV");
-const Enums = ScriptHookV.Enums;
-const Types = ScriptHookV.Types;
-const Joaat = ScriptHookV.Joaat;
+const ScriptHookZig = @import("ScriptHookZig");
+const Enums = ScriptHookZig.Enums;
+const Types = ScriptHookZig.Types;
+const Joaat = ScriptHookZig.Joaat;
 const Natives = @import("natives.zig");
 
 // Constants
@@ -91,7 +91,7 @@ var g: struct {
 } = undefined;
 
 pub fn scriptMain() callconv(.c) void {
-    g_offset = switch (ScriptHookV.getGameVersion()) {
+    g_offset = switch (ScriptHookZig.getGameVersionGTAV()) {
         // Legacy
         // Sources:
         // - https://github.com/calamity-inc/GTA-V-Decompiled-Scripts
@@ -190,7 +190,7 @@ pub fn scriptMain() callconv(.c) void {
         },
         else => {
             std.log.err("Unsupported game version: {any}", .{
-                ScriptHookV.getGameVersion(),
+                ScriptHookZig.getGameVersionGTAV(),
             });
             return;
         },
@@ -198,13 +198,13 @@ pub fn scriptMain() callconv(.c) void {
 
     g = .{
         // Get current Single Player bitset
-        .iSPInitBitset = @ptrCast(ScriptHookV.getGlobalPtr(g_offset.iSPInitBitset)),
+        .iSPInitBitset = @ptrCast(ScriptHookZig.getGlobalPtr(g_offset.iSPInitBitset)),
         // Get current Beast Hunt checkpoints
-        .vBHCheckpoints = @ptrCast(ScriptHookV.getGlobalPtr(g_offset.vBHCheckpoints)),
+        .vBHCheckpoints = @ptrCast(ScriptHookZig.getGlobalPtr(g_offset.vBHCheckpoints)),
         // Get current Beast Hunt path indexes
-        .iBHPathIndexes = @ptrCast(ScriptHookV.getGlobalPtr(g_offset.iBHPathIndexes)),
+        .iBHPathIndexes = @ptrCast(ScriptHookZig.getGlobalPtr(g_offset.iBHPathIndexes)),
         // Get current Beast Hunt path nodes
-        .sBHPath = @ptrCast(ScriptHookV.getGlobalPtr(g_offset.sBHPath)),
+        .sBHPath = @ptrCast(ScriptHookZig.getGlobalPtr(g_offset.sBHPath)),
     };
 
     // Reset visited paths nodes
@@ -215,7 +215,7 @@ pub fn scriptMain() callconv(.c) void {
 
     while (true) {
         update();
-        ScriptHookV.wait(0);
+        ScriptHookZig.wait(0);
     }
 }
 

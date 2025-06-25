@@ -1,7 +1,7 @@
 const std = @import("std");
 const windows = @import("std").os.windows;
 
-const ScriptHookV = @import("ScriptHookV");
+const ScriptHookZig = @import("ScriptHookZig");
 
 const script = @import("script.zig");
 
@@ -24,10 +24,10 @@ pub fn DllMain(
         .PROCESS_ATTACH => {
             arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
             //_ = AllocConsole();
-            ScriptHookV.scriptRegister(@ptrCast(hinstDLL), script.scriptMain);
+            ScriptHookZig.scriptRegister(@ptrCast(hinstDLL), script.scriptMain);
         },
         .PROCESS_DETACH => {
-            ScriptHookV.scriptUnregister(@ptrCast(hinstDLL));
+            ScriptHookZig.scriptUnregister(@ptrCast(hinstDLL));
             //_ = FreeConsole();
             arena.deinit();
         },
