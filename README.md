@@ -42,6 +42,8 @@ so video guides aren't very helpful, but this mod is.
          - Make fight more difficult.
 12. After defeating *The Beast*, you will be able to return to the normal world and continue playing the game.
 
+![image](https://img.gta5-mods.com/q95/images/gtav-beast-hunt-helper/ee7850-Screenshot_20250701_093903-min.png)
+
 ## Troubleshooting
 
 Beast script is very *fragile* don't do nothing unusual, just follow the line and that's all.
