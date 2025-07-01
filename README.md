@@ -3,6 +3,8 @@
 Mod for Grand Theft Auto V that will help you in completing *The Beast Hunt*
 by drawing a lines from player to target checkpoint through path nodes.
 So you would not need to use your hearing abilities to find path nodes anymore.
+Beast Hunt have static path nodes between checkpoints, but selection of next checkpoint is random,
+so video guides aren't very helpful, but this mod is.
 
 ## Building
 
@@ -12,7 +14,7 @@ So you would not need to use your hearing abilities to find path nodes anymore.
 
 ## Usage
 
-1. Download and Install latest version of [ScriptHookV](https://www.dev-c.com/gtav/scripthookv/)
+1. Download and install latest version of [ScriptHookV](https://www.dev-c.com/gtav/scripthookv/)
 2. Download or build this mod as described above.
 3. Copy `BeastHuntHelper.dll` to root of your GTA V installation directory, and change extension to `.asi` (e.g. `BeastHuntHelper.asi`).
 4. Start the game.
@@ -21,16 +23,16 @@ So you would not need to use your hearing abilities to find path nodes anymore.
 7. Eat the last golden peyote to start the beast hunt quest. You will be transformed into a beast (Yeti/Sasquatch/Bigfoot) and the game will start tracking your path nodes and checkpoints.
 8. Now you'll:
       - See a couple of colored lines on the screen:
-         - $${\color{yellow}\textbf{Yellow}}$$ - line from current checkpoint to the first path node.
-         - $${\color{green}\textbf{Green}}$$ - line between path nodes.
-         - $${\color{red}\textbf{Red}}$$ - line from last path node to the next checkpoint.
-         - $${\color{cyan}\textbf{Cyan}}$$ - line from player to the next path node (that's what you should follow).
-         - $${\color{orange}\textbf{Orange}}$$ - line from player to the next checkpoint (that's what you should follow after all path nodes are done).
+         - <b style="color:yellow">Yellow</b> - line from current checkpoint to the first path node.
+         - <b style="color:green">Green</b> - line between path nodes.
+         - <b style="color:red">Red</b> - line from last path node to the next checkpoint.
+         - <b style="color:cyan">Cyan</b> - line from player to the next path node (that's what you should follow).
+         - <b style="color:orange">Orange</b> - line from player to the next checkpoint (that's what you should follow after all path nodes are done).
       - Meet a couple of spheres:
-         - $${\color{cyan}\textbf{Cyan}}$$ - next path node (that's where you need to go).
-         - $${\color{orange}\textbf{Orange}}$$ - next checkpoint (that's where you need to go after path nodes are done).
-9. Follow the $${\color{cyan}\textbf{cyan}}$$ line to the next path nodes (the $${\color{cyan}\textbf{cyan}}$$ sphere) and when no more path nodes are left, follow the $${\color{orange}\textbf{orange}}$$ line to the next checkpoint (the $${\color{orange}\textbf{orange}}$$ sphere).
-10. If path nodes are followed correctly up to the next checkpoint, the game will automatically progress to the next checkpoint and next path nodes and checkpoints will be automatically drawn on the screen.
+         - <b style="color:cyan">Cyan</b> - next path node (that's where you need to go).
+         - <b style="color:orange">Orange</b> - next checkpoint (that's where you need to go after path nodes are done).
+9. Follow the <b style="color:cyan">cyan</b> line to the next path node (the <b style="color:cyan">cyan</b> sphere) and when no more path nodes are left, follow the <b style="color:orange">orange</b> line to the next checkpoint (the <b style="color:orange">orange</b> sphere).
+10. If path nodes are followed correctly up to the next checkpoint, the game will automatically progress to the next checkpoint and next set of path nodes and new checkpoint will be automatically drawn on the screen.
       - If not, try to reload save and start again from step 7 (inclusive).
       - Also check the [troubleshooting](#troubleshooting) section below.
 11. Repeat steps 9-10 until you reach the final checkpoint and meet *The Beast*, and you will have to fight it.
