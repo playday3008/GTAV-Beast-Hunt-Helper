@@ -188,6 +188,12 @@ pub fn scriptMain() callconv(.c) void {
             .iBHPathIndexes = 111119 + 463,
             .sBHPath = 111119 + 463 + 266,
         },
+        .VER_EN_1_0_889_22 => .{
+            .iSPInitBitset = 114370 + 10020 + 25,
+            .vBHCheckpoints = 111119,
+            .iBHPathIndexes = 111119 + 463,
+            .sBHPath = 111119 + 463 + 266,
+        },
         else => |version| {
             std.log.err("Unsupported game version: {any}", .{
                 version,
