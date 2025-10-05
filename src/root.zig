@@ -21,22 +21,18 @@ pub fn DllMain(
 
     switch (reason) {
         .PROCESS_ATTACH => {
-            //_ = AllocConsole();
+            _ = AllocConsole();
             Hook.scriptRegister(@ptrCast(hinstDLL), script.scriptMain);
         },
         .PROCESS_DETACH => {
             Hook.scriptUnregister(@ptrCast(hinstDLL));
-            //_ = FreeConsole();
+            _ = FreeConsole();
         },
         else => {},
     }
 
     return windows.TRUE;
 }
-
-pub extern "kernel32" fn AttachConsole(
-    dwProcessId: windows.DWORD,
-) callconv(.winapi) windows.BOOL;
 
 pub extern "kernel32" fn AllocConsole() callconv(.winapi) windows.BOOL;
 
