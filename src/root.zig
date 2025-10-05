@@ -6,8 +6,6 @@ const Hook = ScriptHookZig.Hook;
 
 const script = @import("script.zig");
 
-pub var arena: std.heap.ArenaAllocator = undefined;
-
 pub fn DllMain(
     hinstDLL: windows.HINSTANCE,
     fdwReason: windows.DWORD,
@@ -23,14 +21,12 @@ pub fn DllMain(
 
     switch (reason) {
         .PROCESS_ATTACH => {
-            arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
             //_ = AllocConsole();
             Hook.scriptRegister(@ptrCast(hinstDLL), script.scriptMain);
         },
         .PROCESS_DETACH => {
             Hook.scriptUnregister(@ptrCast(hinstDLL));
             //_ = FreeConsole();
-            arena.deinit();
         },
         else => {},
     }
