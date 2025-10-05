@@ -4,7 +4,7 @@ const w = std.os.windows;
 const root = @import("root");
 
 const ScriptHookZig = @import("ScriptHookZig");
-const Enums = ScriptHookZig.Enums;
+const Hook = ScriptHookZig.Hook;
 const Types = ScriptHookZig.Types;
 const Joaat = ScriptHookZig.Joaat;
 const Natives = @import("natives.zig");
@@ -91,7 +91,7 @@ var g: struct {
 } = undefined;
 
 pub fn scriptMain() callconv(.c) void {
-    g_offset = switch (ScriptHookZig.getGameVersionGTAV()) {
+    g_offset = switch (Hook.getGameVersionGTAV()) {
         // Legacy
         // Sources:
         // - https://github.com/calamity-inc/GTA-V-Decompiled-Scripts
@@ -188,9 +188,9 @@ pub fn scriptMain() callconv(.c) void {
             .iBHPathIndexes = 111119 + 463,
             .sBHPath = 111119 + 463 + 266,
         },
-        else => {
+        else => |version| {
             std.log.err("Unsupported game version: {any}", .{
-                ScriptHookZig.getGameVersionGTAV(),
+                version,
             });
             return;
         },
@@ -198,13 +198,13 @@ pub fn scriptMain() callconv(.c) void {
 
     g = .{
         // Get current Single Player bitset
-        .iSPInitBitset = @ptrCast(ScriptHookZig.getGlobalPtr(g_offset.iSPInitBitset)),
+        .iSPInitBitset = @ptrCast(Hook.getGlobalPtr(g_offset.iSPInitBitset)),
         // Get current Beast Hunt checkpoints
-        .vBHCheckpoints = @ptrCast(ScriptHookZig.getGlobalPtr(g_offset.vBHCheckpoints)),
+        .vBHCheckpoints = @ptrCast(Hook.getGlobalPtr(g_offset.vBHCheckpoints)),
         // Get current Beast Hunt path indexes
-        .iBHPathIndexes = @ptrCast(ScriptHookZig.getGlobalPtr(g_offset.iBHPathIndexes)),
+        .iBHPathIndexes = @ptrCast(Hook.getGlobalPtr(g_offset.iBHPathIndexes)),
         // Get current Beast Hunt path nodes
-        .sBHPath = @ptrCast(ScriptHookZig.getGlobalPtr(g_offset.sBHPath)),
+        .sBHPath = @ptrCast(Hook.getGlobalPtr(g_offset.sBHPath)),
     };
 
     // Reset visited paths nodes
@@ -215,7 +215,7 @@ pub fn scriptMain() callconv(.c) void {
 
     while (true) {
         update();
-        ScriptHookZig.wait(0);
+        Hook.wait(0);
     }
 }
 
@@ -503,4 +503,10 @@ fn dumpGlobals() void {
         std.debug.print("  }},\n", .{});
     }
     std.debug.print("}};\n", .{});
+}
+
+test "script" {
+    const testing = std.testing;
+
+    testing.refAllDeclsRecursive(@This());
 }

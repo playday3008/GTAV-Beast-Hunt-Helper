@@ -17347,3 +17347,10 @@ pub const Zone = struct
 };
 
 // zig fmt: on
+
+test "natives" {
+    const std = @import("std");
+    const testing = std.testing;
+
+    testing.refAllDeclsRecursive(@This());
+}

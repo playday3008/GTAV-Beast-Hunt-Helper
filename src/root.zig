@@ -2,6 +2,7 @@ const std = @import("std");
 const windows = @import("std").os.windows;
 
 const ScriptHookZig = @import("ScriptHookZig");
+const Hook = ScriptHookZig.Hook;
 
 const script = @import("script.zig");
 
@@ -24,10 +25,10 @@ pub fn DllMain(
         .PROCESS_ATTACH => {
             arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
             //_ = AllocConsole();
-            ScriptHookZig.scriptRegister(@ptrCast(hinstDLL), script.scriptMain);
+            Hook.scriptRegister(@ptrCast(hinstDLL), script.scriptMain);
         },
         .PROCESS_DETACH => {
-            ScriptHookZig.scriptUnregister(@ptrCast(hinstDLL));
+            Hook.scriptUnregister(@ptrCast(hinstDLL));
             //_ = FreeConsole();
             arena.deinit();
         },
@@ -44,3 +45,9 @@ pub extern "kernel32" fn AttachConsole(
 pub extern "kernel32" fn AllocConsole() callconv(.winapi) windows.BOOL;
 
 pub extern "kernel32" fn FreeConsole() callconv(.winapi) windows.BOOL;
+
+test "root" {
+    const testing = std.testing;
+
+    testing.refAllDeclsRecursive(@This());
+}
