@@ -58,23 +58,29 @@ var g: struct {
     vBHCheckpoints: *extern struct {
         size: u64,
         data: [CHECKPOINT_COUNT]Types.Vector3,
+
+        comptime {
+            const expected_size = @sizeOf(u64) + CHECKPOINT_COUNT * 3 * @sizeOf(u64);
+            if (@sizeOf(@This()) != expected_size) {
+                @compileError(std.fmt.comptimePrint(
+                    "Size of {s} isn't 0x{X}, it's 0x{X}",
+                    .{
+                        @typeName(@This()),
+                        expected_size,
+                        @sizeOf(@This()),
+                    },
+                ));
+            }
+        }
     },
     iBHPathIndexes: *extern struct {
         size: u64,
         data: [CHECKPOINT_COUNT]extern struct {
             size: u64,
             data: [CHECKPOINT_COUNT]i64,
-        },
-    },
-    sBHPath: *extern struct {
-        size: u64,
-        data: [MAX_PATH_COUNT]extern struct {
-            length: u64,
-            size: u64,
-            nodes: [NODES_PER_PATH]Types.Vector3,
 
             comptime {
-                const expected_size = 14 * @sizeOf(u64);
+                const expected_size = @sizeOf(u64) + CHECKPOINT_COUNT * @sizeOf(i64);
                 if (@sizeOf(@This()) != expected_size) {
                     @compileError(std.fmt.comptimePrint(
                         "Size of {s} isn't 0x{X}, it's 0x{X}",
@@ -87,6 +93,56 @@ var g: struct {
                 }
             }
         },
+
+        comptime {
+            const expected_size = @sizeOf(u64) + CHECKPOINT_COUNT * (@sizeOf(u64) + CHECKPOINT_COUNT * @sizeOf(i64));
+            if (@sizeOf(@This()) != expected_size) {
+                @compileError(std.fmt.comptimePrint(
+                    "Size of {s} isn't 0x{X}, it's 0x{X}",
+                    .{
+                        @typeName(@This()),
+                        expected_size,
+                        @sizeOf(@This()),
+                    },
+                ));
+            }
+        }
+    },
+    sBHPath: *extern struct {
+        size: u64,
+        data: [MAX_PATH_COUNT]extern struct {
+            length: u64,
+            size: u64,
+            nodes: [NODES_PER_PATH]Types.Vector3,
+
+            comptime {
+                const expected_size = 2 * @sizeOf(u64) + NODES_PER_PATH * 3 * @sizeOf(u64);
+                if (@sizeOf(@This()) != expected_size) {
+                    @compileError(std.fmt.comptimePrint(
+                        "Size of {s} isn't 0x{X}, it's 0x{X}",
+                        .{
+                            @typeName(@This()),
+                            expected_size,
+                            @sizeOf(@This()),
+                        },
+                    ));
+                }
+            }
+        },
+
+        comptime {
+            const expected_size = @sizeOf(u64) + MAX_PATH_COUNT * (2 * @sizeOf(u64) + NODES_PER_PATH * 3 * @sizeOf(u64));
+            if (@sizeOf(@This()) != expected_size) {
+                @compileError(std.fmt.comptimePrint(
+                    "Size of {s} isn't 0x{X}, it's 0x{X}",
+                    .{
+                        @typeName(@This()),
+                        expected_size,
+                        @sizeOf(@This()),
+                    },
+                ));
+            }
+        }
     },
 } = undefined;
 
