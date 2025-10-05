@@ -228,7 +228,6 @@ pub fn scriptMain() callconv(.c) void {
 // As path state is stored here, reloading the script will reset
 // path between checkpoints but not the checkpoints themselves.
 var visitedPathsNodes: [MAX_PATH_COUNT][NODES_PER_PATH]?bool = undefined;
-var callTick: i64 = 0;
 
 fn update() void {
     // Get player ped and position
@@ -243,7 +242,6 @@ fn update() void {
         g.iSPInitBitset.BEAST_LAST_PEYOTE_DAY != 7 or
         playerModel != Joaat.atStringHash(u32, "IG_ORLEANS"))
     {
-        g.iSPInitBitset.BEAST_CALL_MADE = false;
         resetVisited();
         return;
     }
@@ -386,14 +384,6 @@ fn update() void {
                 }
             }
         }
-    }
-
-    // Make a call every 10 seconds
-    if (std.time.milliTimestamp() - callTick > 10_000) {
-        callTick = std.time.milliTimestamp();
-
-        // Call Beast Hunt script
-        g.iSPInitBitset.BEAST_CALL_MADE = true;
     }
 }
 
