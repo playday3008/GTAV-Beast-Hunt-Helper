@@ -1,7 +1,7 @@
 const std = @import("std");
 const w = std.os.windows;
 
-const root = @import("root");
+const log = std.log.scoped(.script);
 
 const ScriptHookZig = @import("ScriptHookZig");
 const Hook = ScriptHookZig.Hook;
@@ -257,7 +257,7 @@ pub fn scriptMain() callconv(.c) void {
             .sBHPath = 111119 + 463 + 266,
         },
         else => |version| {
-            std.log.err("Unsupported game version: {any}", .{
+            log.err("Unsupported game version: {any}", .{
                 version,
             });
             return;
@@ -315,6 +315,7 @@ fn update() void {
         return;
     }
 
+    // Path drawing and node visiting
     {
         const index: usize = @intCast(g.iBHPathIndexes.data[g.iSPInitBitset.BEAST_CURRENT_CHECKPOINT].data[g.iSPInitBitset.BEAST_NEXT_CHECKPOINT]);
         const path = g.sBHPath.data[index];
@@ -414,7 +415,7 @@ fn update() void {
                         if (dist < PATH_NODE_RADIUS) // Tight radius check, just to be sure
                         {
                             visitedNodes[i] = true;
-                            std.log.debug(
+                            log.info(
                                 "Visited: ({d:>8.3}, {d:>8.3}, {d:>7.3})",
                                 .{ node.x, node.y, node.z },
                             );
@@ -470,9 +471,9 @@ fn resetVisited() void {
 
 fn dumpGlobals() void {
     const dumpSPInitBitset = true;
-    const dumpBHCheckpoints = false;
-    const dumpBHPathIndexes = false;
-    const dumpBHPath = false;
+    const dumpBHCheckpoints = true;
+    const dumpBHPathIndexes = true;
+    const dumpBHPath = true;
     std.debug.print("g = {{\n", .{});
     if (dumpSPInitBitset) {
         std.debug.print("  iSPInitBitset: {{\n", .{});
@@ -498,7 +499,7 @@ fn dumpGlobals() void {
         std.debug.print("    size: {any},\n", .{g.vBHCheckpoints.size});
         std.debug.print("    data: {{\n", .{});
         for (g.vBHCheckpoints.data, 0..) |checkpoint, i| {
-            std.debug.print("      {d:2}: ({d:>8.3}, {d:>8.3}, {d:>7.3}),\n", .{
+            std.debug.print("      {d:2}: ({d:>8.3}, {d:>8.3}, {d:>7.4}),\n", .{
                 i,
                 checkpoint.x,
                 checkpoint.y,
