@@ -369,6 +369,12 @@ pub fn scriptMain() callconv(.c) void {
             .iBHPathIndexes = 111119 + 463,
             .sBHPath = 111119 + 463 + 266,
         },
+        .VER_EN_1_0_1013_17 => .{
+            .iSPInitBitset = 114931 + 10023 + 25,
+            .vBHCheckpoints = 111680,
+            .iBHPathIndexes = 111680 + 463,
+            .sBHPath = 111680 + 463 + 266,
+        },
         else => |version| {
             // TODO: Scan globals for known values to auto-detect offsets
             const allocator = std.heap.page_allocator;
