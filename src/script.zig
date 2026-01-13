@@ -331,6 +331,18 @@ pub fn scriptMain() callconv(.c) void {
             .iBHPathIndexes = 111093 + 463,
             .sBHPath = 111093 + 463 + 266,
         },
+        .VER_1_0_3586_0 => .{
+            .iSPInitBitset = 114904 + 10023 + 25,
+            .vBHCheckpoints = 111653,
+            .iBHPathIndexes = 111653 + 463,
+            .sBHPath = 111653 + 463 + 266,
+        },
+        .VER_1_0_3717_0 => .{
+            .iSPInitBitset = 114904 + 10023 + 25,
+            .vBHCheckpoints = 111653,
+            .iBHPathIndexes = 111653 + 463,
+            .sBHPath = 111653 + 463 + 266,
+        },
         // Enhanced
         // Source: Me
         .VER_EN_1_0_814_9 => .{
