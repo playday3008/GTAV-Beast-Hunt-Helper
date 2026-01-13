@@ -49,6 +49,27 @@ so video guides aren't very helpful, but this mod is.
 Beast script is very *fragile* don't do nothing unusual, just follow the line and that's all.
 Also, this mod has it's own state which tracks the progress between checkpoints, a.k.a. path nodes, as it's very hard to completely hook script state as not everything this mod needs is stored in global variables.
 
+## How to obtain offsets
+
+1. Open `<game folder>/update/update2.rpf` in [OpenIV](https://openiv.com/)
+2. Extract `x64/levels/gta5/script/script_rel.rpf`
+3. Open `script_rel.rpf` in [OpenIV](https://openiv.com/)
+4. Extract `player_controller.ysc`
+5. Open `player_controller.ysc` in [ImHex](https://imhex.werwolv.net/) and change 5th byte from 0x0C to 0x0A
+6. Export modified `player_controller.ysc` in [OpenIV](https://openiv.com/)
+7. Decompile exported `player_controller.ysc.full` using [GTA-V-Script-Decompiler](https://github.com/maybegreat48/GTA-V-Script-Decompiler)
+8. Search for regex patterns to find offsets:
+   - iSPInitBitset: `return IS_BIT_SET\(Global_(\d+)\.f_(\d+)\.f_(\d+), 7\) && !IS_BIT_SET\(Global_\1\.f_\2\.f_\3, 8\)`
+     - Sum of all 3 captured numbers is the offset
+   - vBHCheckpoints: `Global_(\d+)\[0 \/\*3\*\/]\.f_2 = 149\.05f;`
+     - First captured number is the offset
+   - iBHPathIndexes: `return Global_(\d+)\[\*uParam1 \/\*12\*\/]\[\*uParam2];`
+     - First captured number is the offset
+     - Usually it's `vBHCheckpoints` offset + 463
+   - sBHPath: `{ Global_(\d+)\[num3 \/\*14\*\/]\.f_1\[iParam1 - 1 \/\*3\*\/] };`
+     - First captured number is the offset
+     - Usually it's `iBHPathIndexes` offset + 266
+
 ## Contributing
 
 Feel free to open issues or pull requests if you have any suggestions or improvements.
