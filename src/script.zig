@@ -447,7 +447,12 @@ fn update() void {
 
     // Path drawing and node visiting
     {
-        const index: usize = @intCast(g.iBHPathIndexes.data[g.iSPInitBitset.BEAST_CURRENT_CHECKPOINT].data[g.iSPInitBitset.BEAST_NEXT_CHECKPOINT]);
+        const pathIndex = g.iBHPathIndexes.data[g.iSPInitBitset.BEAST_CURRENT_CHECKPOINT].data[g.iSPInitBitset.BEAST_NEXT_CHECKPOINT];
+        // Path index can be -1 if there's no valid path between checkpoints
+        if (pathIndex < 0 or pathIndex >= MAX_PATH_COUNT) {
+            return;
+        }
+        const index: usize = @intCast(pathIndex);
         const path = g.sBHPath.data[index];
         const visitedNodes = &visitedPathsNodes[index];
 
