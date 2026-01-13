@@ -1,4 +1,4 @@
-// Generated on 07/06/2025, 03:00:26
+// Generated on 13/01/2026, 10:56:03
 // http://localhost:3000
 // PR: https://github.com/DottieDot/GTAV-NativeDB/pull/119
 
@@ -422,6 +422,7 @@ pub const Audio = struct
     pub inline fn isAnimalVocalizationPlaying(ped_handle: types.Ped) windows.BOOL { return invoker.invoke(windows.BOOL, 0xC265DF9FB44A9FBD, .{ped_handle}); } // 0xC265DF9FB44A9FBD 0x0CBAF2EF b323
     /// mood can be 0 or 1 (it's not a boolean value!). Effects audio of the animal.
     pub inline fn setAnimalMood(animal: types.Ped, mood: c_int) void { invoker.invoke(void, 0xCC97B29285B1DC3B, .{animal, mood}); } // 0xCC97B29285B1DC3B 0x3EA7C6CB b323
+    pub inline fn playPedAudioEventAnim(ped_handle: types.Ped, audio_event: [*c]const u8) void { invoker.invoke(void, 0xAD2191A6E3543189, .{ped_handle, audio_event}); } // 0xAD2191A6E3543189  b3717
     pub inline fn isMobilePhoneRadioActive() windows.BOOL { return invoker.invoke(windows.BOOL, 0xB35CE999E8EF317E, .{}); } // 0xB35CE999E8EF317E 0x6E502A5B b323
     pub inline fn setMobilePhoneRadioState(state: windows.BOOL) void { invoker.invoke(void, 0xBF286C554784F3DF, .{state}); } // 0xBF286C554784F3DF 0xE1E0ED34 b323
     /// Returns 255 (radio off index) if the function fails.
@@ -565,9 +566,7 @@ pub const Audio = struct
     /// Overrides the vehicle's horn hash. \
     /// When changing this hash on a vehicle, it will not return the 'overwritten' hash. It will still always return the default horn hash (same as GET_VEHICLE_DEFAULT_HORN)
     /// 
-    /// vehicle - the vehicle whose horn should be overwritten \
-    /// mute - p1 seems to be an option for muting the horn \
-    /// p2 - maybe a horn id, since the function AUDIO::GET_VEHICLE_DEFAULT_HORN(veh) exists?
+    /// vehicle - the vehicle whose horn should be overwritten
     pub inline fn overrideVehHorn(vehicle: types.Vehicle, override: windows.BOOL, horn_hash: c_int) void { invoker.invoke(void, 0x3CDC1E622CCE0356, .{vehicle, override, horn_hash}); } // 0x3CDC1E622CCE0356 0x2ACAB783 b323
     /// Checks whether the horn of a vehicle is currently played.
     pub inline fn isHornActive(vehicle: types.Vehicle) windows.BOOL { return invoker.invoke(windows.BOOL, 0x9D6BFC12B05C6121, .{vehicle}); } // 0x9D6BFC12B05C6121 0x20E2BDD0 b323
@@ -575,7 +574,6 @@ pub const Audio = struct
     pub inline fn setAggressiveHorns(toggle: windows.BOOL) void { invoker.invoke(void, 0x395BF71085D1B1D9, .{toggle}); } // 0x395BF71085D1B1D9 0x01D6EABE b323
     /// Does nothing (it's a nullsub).
     pub inline fn setRadioPositionAudioMute(p_0: windows.BOOL) void { invoker.invoke(void, 0x02E93C796ABD3A97, .{p_0}); } // 0x02E93C796ABD3A97 0x3C395AEE b323
-    /// SET_VEHICLE_CONVERSATIONS_PERSIST?
     pub inline fn setVehicleConversationsPersist(p_0: windows.BOOL, p_1: windows.BOOL) void { invoker.invoke(void, 0x58BB377BEC7CD5F4, .{p_0, p_1}); } // 0x58BB377BEC7CD5F4 0x8CE63FA1 b323
     pub inline fn setVehicleConversationsPersistNew(p_0: windows.BOOL, p_1: windows.BOOL, p_2: windows.BOOL) void { invoker.invoke(void, 0x9BD7BD55E4533183, .{p_0, p_1, p_2}); } // 0x9BD7BD55E4533183  b1290
     pub inline fn isStreamPlaying() windows.BOOL { return invoker.invoke(windows.BOOL, 0xD11FA52EB849D978, .{}); } // 0xD11FA52EB849D978 0xF1F51A14 b323
@@ -688,7 +686,6 @@ pub const Audio = struct
     pub inline fn startAudioScene(scene: [*c]const u8) windows.BOOL { return invoker.invoke(windows.BOOL, 0x013A80FC08F6E4F2, .{scene}); } // 0x013A80FC08F6E4F2 0xE48D757B b323
     /// Full list of audio scene names by DurtyFree https://github.com/DurtyFree/gta-v-data-dumps/blob/master/audioSceneNames.json
     pub inline fn stopAudioScene(scene: [*c]const u8) void { invoker.invoke(void, 0xDFE8422B3B94E688, .{scene}); } // 0xDFE8422B3B94E688 0xA08D8C58 b323
-    /// ??
     pub inline fn stopAudioScenes() void { invoker.invoke(void, 0xBAC7FC81A75EC1A1, .{}); } // 0xBAC7FC81A75EC1A1 0xF6C7342A b323
     /// Full list of audio scene names by DurtyFree https://github.com/DurtyFree/gta-v-data-dumps/blob/master/audioSceneNames.json
     pub inline fn isAudioSceneActive(scene: [*c]const u8) windows.BOOL { return invoker.invoke(windows.BOOL, 0xB65B60556E2A9225, .{scene}); } // 0xB65B60556E2A9225 0xACBED05C b323
@@ -932,6 +929,7 @@ pub const Audio = struct
     /// 
     ///  AUDIO::SET_PORTAL_SETTINGS_OVERRIDE("V_MICHAEL_PS_BATHROOM_WITH_WINDOW", "V_MICHAEL_PS_BATHROOM_WITHOUT_WINDOW");
     pub inline fn setPortalSettingsOverride(p_0: [*c]const u8, p_1: [*c]const u8) void { invoker.invoke(void, 0x044DBAD7A7FA2BE5, .{p_0, p_1}); } // 0x044DBAD7A7FA2BE5 0x8AD670EC b323
+    pub inline fn setIndividualPortalSettingsOverride(interior_name_hash: types.Hash, room_index: c_int, door_index: c_int, new_portal_settings_name: [*c]const u8) void { invoker.invoke(void, 0xC9D623C5A3D8FD5D, .{interior_name_hash, room_index, door_index, new_portal_settings_name}); } // 0xC9D623C5A3D8FD5D  b3570
     ///  Found in the b617d scripts, duplicates removed: 
     /// 
     ///  AUDIO::REMOVE_PORTAL_SETTINGS_OVERRIDE("V_CARSHOWROOM_PS_WINDOW_UNBROKEN"); \
@@ -940,7 +938,7 @@ pub const Audio = struct
     ///  AUDIO::REMOVE_PORTAL_SETTINGS_OVERRIDE("V_FINALEBANK_PS_VAULT_INTACT"); \
     ///  AUDIO::REMOVE_PORTAL_SETTINGS_OVERRIDE("V_MICHAEL_PS_BATHROOM_WITH_WINDOW");
     pub inline fn removePortalSettingsOverride(p_0: [*c]const u8) void { invoker.invoke(void, 0xB4BBFD9CD8B3922B, .{p_0}); } // 0xB4BBFD9CD8B3922B 0xD24B4D0C b323
-    /// STOP_S[MOKE_GRENADE_EXPLOSION_SOUNDS]?
+    pub inline fn removeIndividualPortalSettingsOverride(interior_name_hash: types.Hash, room_index: c_int, door_index: c_int) void { invoker.invoke(void, 0x8EF105736194F80C, .{interior_name_hash, room_index, door_index}); } // 0x8EF105736194F80C  b3570
     pub inline fn stopSmokeGrenadeExplosionSounds() void { invoker.invoke(void, 0xE4E6DD5566D28C82, .{}); } // 0xE4E6DD5566D28C82 0x7262B5BA b323
     pub inline fn getMusicVolSlider() c_int { return invoker.invoke(c_int, 0x3A48AB4445D499BE, .{}); } // 0x3A48AB4445D499BE 0x93A44A1F b323
     pub inline fn requestTennisBanks(ped: types.Ped) void { invoker.invoke(void, 0x4ADA3F19BE4A6047, .{ped}); } // 0x4ADA3F19BE4A6047 0x13777A0B b323
@@ -1638,6 +1636,7 @@ pub const Cutscene = struct
     /// Simply unloads the cutscene and doesn't do extra stuff that REMOVE_CUTSCENE does. \
     /// Full list of cutscene names by DurtyFree https://github.com/DurtyFree/gta-v-data-dumps/blob/master/cutsceneNames.json
     pub inline fn removeCutFile(cutscene_name: [*c]const u8) void { invoker.invoke(void, 0xD00D76A7DFC9D852, .{cutscene_name}); } // 0xD00D76A7DFC9D852 0xB70D7C6D b323
+    pub inline fn getCutFileOffset(cutscene_name: [*c]const u8, index: c_int) types.Vector3 { return invoker.invoke(types.Vector3, 0x1FA904B60E492336, .{cutscene_name, index}); } // 0x1FA904B60E492336  b3570
     /// Full list of cutscene names by DurtyFree https://github.com/DurtyFree/gta-v-data-dumps/blob/master/cutsceneNames.json
     pub inline fn getCutFileConcatCount(cutscene_name: [*c]const u8) c_int { return invoker.invoke(c_int, 0x0ABC54DE641DC0FC, .{cutscene_name}); } // 0x0ABC54DE641DC0FC 0xFD8B1AC2 b323
     /// flags: Usually 0.
@@ -1680,11 +1679,7 @@ pub const Cutscene = struct
     pub inline fn setCutsceneMultiheadFade(p_0: windows.BOOL, p_1: windows.BOOL, p_2: windows.BOOL, p_3: windows.BOOL) void { invoker.invoke(void, 0x20746F7B1032A3C7, .{p_0, p_1, p_2, p_3}); } // 0x20746F7B1032A3C7  b323
     pub inline fn setCutsceneMultiheadFadeManual(p_0: windows.BOOL) void { invoker.invoke(void, 0x06EE9048FD080382, .{p_0}); } // 0x06EE9048FD080382  b323
     pub inline fn isMultiheadFadeUp() windows.BOOL { return invoker.invoke(windows.BOOL, 0xA0FE76168A189DDB, .{}); } // 0xA0FE76168A189DDB  b323
-    /// Stops current cutscene with a fade transition \
-    /// p0: always true in R* Scripts \
-    /// You will need to manually fade the screen back in \
-    /// SET_CUTSCENE_INPUTS_PARTIALLY_FADE?
-    pub inline fn networkSetMocapCutsceneCanBeSkipped(p_0: windows.BOOL) void { invoker.invoke(void, 0x2F137B508DE238F2, .{p_0}); } // 0x2F137B508DE238F2 0x8338DA1D b323
+    pub inline fn networkSetMocapCutsceneCanBeSkipped(toggle: windows.BOOL) void { invoker.invoke(void, 0x2F137B508DE238F2, .{toggle}); } // 0x2F137B508DE238F2 0x8338DA1D b323
     pub inline fn setCarGeneratorsCanUpdateDuringCutscene(p_0: windows.BOOL) void { invoker.invoke(void, 0xE36A98D8AB3D3C66, .{p_0}); } // 0xE36A98D8AB3D3C66 0x04377C10 b323
     pub inline fn canUseMobilePhoneDuringCutscene() windows.BOOL { return invoker.invoke(windows.BOOL, 0x5EDEF0CF8C1DAB3C, .{}); } // 0x5EDEF0CF8C1DAB3C 0xDBD88708 b323
     pub inline fn setCutsceneCanBeSkipped(p_0: windows.BOOL) void { invoker.invoke(void, 0x41FAA8FB2ECE8720, .{p_0}); } // 0x41FAA8FB2ECE8720 0x28D54A7F b323
@@ -2062,8 +2057,6 @@ pub const Entity = struct
     /// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
     pub inline fn isEntityPlayingAnim(entity: types.Entity, anim_dict: [*c]const u8, anim_name: [*c]const u8, task_flag: c_int) windows.BOOL { return invoker.invoke(windows.BOOL, 0x1F0B79228E461EC9, .{entity, anim_dict, anim_name, task_flag}); } // 0x1F0B79228E461EC9 0x0D130D34 b323
     /// a static ped will not react to natives like "APPLY_FORCE_TO_ENTITY" or "SET_ENTITY_VELOCITY" and oftentimes will not react to task-natives like "TASK::TASK_COMBAT_PED". The only way I know of to make one of these peds react is to ragdoll them (or sometimes to use CLEAR_PED_TASKS_IMMEDIATELY(). Static peds include almost all far-away peds, beach-combers, peds in certain scenarios, peds crossing a crosswalk, peds walking to get back into their cars, and others. If anyone knows how to make a ped non-static without ragdolling them, please edit this with the solution.
-    /// 
-    /// how can I make an entity static???
     pub inline fn isEntityStatic(entity: types.Entity) windows.BOOL { return invoker.invoke(windows.BOOL, 0x1218E6886D3D8327, .{entity}); } // 0x1218E6886D3D8327 0x928E12E9 b323
     pub inline fn isEntityTouchingEntity(entity: types.Entity, target_entity: types.Entity) windows.BOOL { return invoker.invoke(windows.BOOL, 0x17FFC1B2BA35A494, .{entity, target_entity}); } // 0x17FFC1B2BA35A494 0x6B931477 b323
     pub inline fn isEntityTouchingModel(entity: types.Entity, model_hash: types.Hash) windows.BOOL { return invoker.invoke(windows.BOOL, 0x0F42323798A58C8C, .{entity, model_hash}); } // 0x0F42323798A58C8C 0x307E7611 b323
@@ -2223,7 +2216,6 @@ pub const Entity = struct
     /// 
     /// RAGEPluginHook list: docs.ragepluginhook.net/html/62951c37-a440-478c-b389-c471230ddfc5.htm
     pub inline fn stopEntityAnim(entity: types.Entity, animation: [*c]const u8, anim_group: [*c]const u8, p_3: f32) windows.BOOL { return invoker.invoke(windows.BOOL, 0x28004F88151E03E0, .{entity, animation, anim_group, p_3}); } // 0x28004F88151E03E0 0xC4769830 b323
-    /// p1 sync task id?
     pub inline fn stopSynchronizedEntityAnim(entity: types.Entity, p_1: f32, p_2: windows.BOOL) windows.BOOL { return invoker.invoke(windows.BOOL, 0x43D3807C077261E3, .{entity, p_1, p_2}); } // 0x43D3807C077261E3 0xE27D2FC1 b323
     /// if (ENTITY::HAS_ANIM_EVENT_FIRED(PLAYER::PLAYER_PED_ID(), MISC::GET_HASH_KEY("CreateObject")))
     pub inline fn hasAnimEventFired(entity: types.Entity, action_hash: types.Hash) windows.BOOL { return invoker.invoke(windows.BOOL, 0xEAF4CD9EA3E7E922, .{entity, action_hash}); } // 0xEAF4CD9EA3E7E922 0x66571CA0 b323
@@ -2703,6 +2695,9 @@ pub const Fire = struct
     /// 
     /// explosionType: See ADD_EXPLOSION.
     pub inline fn getOwnerOfExplosionInAngledArea(explosion_type: c_int, vec_1__: types.Vector3, vec_2__: types.Vector3, radius: f32) types.Entity { return invoker.invoke(types.Entity, 0x14BA4BA137AF6CEC, .{explosion_type, vec_1__.x, vec_1__.y, vec_1__.z, vec_2__.x, vec_2__.y, vec_2__.z, radius}); } // 0x14BA4BA137AF6CEC 0xAEC0D176 b323
+    pub inline fn networkExpectExplosionEventsForPlayer_(expect: windows.BOOL, player: types.Player) void { invoker.invoke(void, 0x5241DB47A8B8AD54, .{expect, player}); } // 0x5241DB47A8B8AD54  b3570
+    pub inline fn getMaximumNumberOfWaterCannons_() c_int { return invoker.invoke(c_int, 0x56581E7E219D6263, .{}); } // 0x56581E7E219D6263  b3717
+    pub inline fn getWaterCannonCoords_(index: c_int) types.Vector3 { return invoker.invoke(types.Vector3, 0xE61CBD3ED80E7327, .{index}); } // 0xE61CBD3ED80E7327  b3717
 };
 
 pub const Graphics = struct
@@ -3131,7 +3126,6 @@ pub const Graphics = struct
     pub inline fn getBinkMovieTime(bink_movie: c_int) f32 { return invoker.invoke(f32, 0x8E17DDD6B9D5BF29, .{bink_movie}); } // 0x8E17DDD6B9D5BF29  b1734
     /// binkMovie: Is return value from _SET_BINK_MOVIE. Has something to do with bink volume? (audRequestedSettings::SetVolumeCurveScale)
     pub inline fn setBinkMovieVolume(bink_movie: c_int, value: f32) void { invoker.invoke(void, 0xAFF33B1178172223, .{bink_movie, value}); } // 0xAFF33B1178172223  b1290
-    /// Might be more appropriate in AUDIO?
     pub inline fn attachTvAudioToEntity(entity: types.Entity) void { invoker.invoke(void, 0x845BAD77CC770633, .{entity}); } // 0x845BAD77CC770633 0x784944DB b323
     pub inline fn setBinkMovieAudioFrontend(bink_movie: c_int, p_1: windows.BOOL) void { invoker.invoke(void, 0xF816F2933752322D, .{bink_movie, p_1}); } // 0xF816F2933752322D  b1868
     /// Probably changes tvs from being a 3d audio to being "global" audio
@@ -3244,7 +3238,7 @@ pub const Graphics = struct
     pub inline fn disableProcobjCreation() void { invoker.invoke(void, 0x1612C45F9E3E0D44, .{}); } // 0x1612C45F9E3E0D44  b323
     pub inline fn enableProcobjCreation() void { invoker.invoke(void, 0x5DEBD9C4DC995692, .{}); } // 0x5DEBD9C4DC995692  b323
     pub inline fn grassbatchEnableFlatteningExtInSphere(vec: types.Vector3, p_3: types.Any, p_4: f32, p_5: f32, p_6: f32, scale: f32) void { invoker.invoke(void, 0xAAE9BE70EC7C69AB, .{vec.x, vec.y, vec.z, p_3, p_4, p_5, p_6, scale}); } // 0xAAE9BE70EC7C69AB  b1290
-    /// Wraps 0xAAE9BE70EC7C69AB with FLT_MAX as p7, Jenkins: 0x73E96210?
+    /// Wraps 0xAAE9BE70EC7C69AB with FLT_MAX as p7
     pub inline fn grassbatchEnableFlatteningInSphere(vec: types.Vector3, radius: f32, p_4: f32, p_5: f32, p_6: f32) void { invoker.invoke(void, 0x6D955F6A9E0295B1, .{vec.x, vec.y, vec.z, radius, p_4, p_5, p_6}); } // 0x6D955F6A9E0295B1  b323
     pub inline fn grassbatchDisableFlattening() void { invoker.invoke(void, 0x302C91AB2D477F7E, .{}); } // 0x302C91AB2D477F7E  b323
     pub inline fn cascadeShadowsInitSession() void { invoker.invoke(void, 0x03FC694AE06C5A20, .{}); } // 0x03FC694AE06C5A20 0x48F16186 b323
@@ -3767,8 +3761,6 @@ pub const Graphics = struct
     pub inline fn beginTextCommandScaleformString(component_type: [*c]const u8) void { invoker.invoke(void, 0x80338406F3475E55, .{component_type}); } // 0x80338406F3475E55 0x3AC9CB55 b323
     pub inline fn endTextCommandScaleformString() void { invoker.invoke(void, 0x362E2D3FE93A9959, .{}); } // 0x362E2D3FE93A9959 0x386CE0B8 b323
     /// Same as END_TEXT_COMMAND_SCALEFORM_STRING but does not perform HTML conversion for text tokens.
-    /// 
-    /// END_TEXT_COMMAND_VIA_SPECIAL_MODIFIABLE_STRING?
     pub inline fn endTextCommandUnparsedScaleformString() void { invoker.invoke(void, 0xAE4E8157D9ECF087, .{}); } // 0xAE4E8157D9ECF087 0x2E80DB52 b323
     /// Same as SCALEFORM_MOVIE_METHOD_ADD_PARAM_TEXTURE_NAME_STRING \
     /// Both SCALEFORM_MOVIE_METHOD_ADD_PARAM_TEXTURE_NAME_STRING / _SCALEFORM_MOVIE_METHOD_ADD_PARAM_TEXTURE_NAME_STRING_2 works, but _SCALEFORM_MOVIE_METHOD_ADD_PARAM_TEXTURE_NAME_STRING_2 is usually used for "name" (organisation, players..).
@@ -4670,6 +4662,8 @@ pub const Hud = struct
     pub inline fn refreshWaypoint() void { invoker.invoke(void, 0x81FA173F170560D1, .{}); } // 0x81FA173F170560D1 0xB395D753 b323
     pub inline fn isWaypointActive() windows.BOOL { return invoker.invoke(windows.BOOL, 0x1DD1F58F493F1DA5, .{}); } // 0x1DD1F58F493F1DA5 0x5E4DF47B b323
     pub inline fn setNewWaypoint(vec: types.Vector2) void { invoker.invoke(void, 0xFE43368D2AA4F2FC, .{vec.x, vec.y}); } // 0xFE43368D2AA4F2FC 0x8444E1F0 b323
+    pub inline fn getWaypointClearOnArrivalMode() c_int { return invoker.invoke(c_int, 0xF46851AB8B02EF40, .{}); } // 0xF46851AB8B02EF40  b3717
+    pub inline fn setWaypointClearOnArrivalMode(mode: c_int) void { invoker.invoke(void, 0x3FFC556B62146F75, .{mode}); } // 0x3FFC556B62146F75  b3717
     pub inline fn setBlipBright(blip: types.Blip, toggle: windows.BOOL) void { invoker.invoke(void, 0xB203913733F27884, .{blip, toggle}); } // 0xB203913733F27884 0x72BEE6DF b323
     /// As of b2189, the third parameter sets the color of the cone (before b2189 it was ignored). Note that it uses HUD colors, not blip colors.
     pub inline fn setBlipShowCone(blip: types.Blip, toggle: windows.BOOL, hud_color_index: c_int) void { invoker.invoke(void, 0x13127EC3665E8EE1, .{blip, toggle, hud_color_index}); } // 0x13127EC3665E8EE1 0xFF545AD8 b323
@@ -4698,8 +4692,7 @@ pub const Hud = struct
     /// 
     /// Too bad this wouldn't work over the network (obviously not). Could spoof where we would be.
     pub inline fn setFakePausemapPlayerPositionThisFrame(vec: types.Vector2) void { invoker.invoke(void, 0x77E2DD177910E1CF, .{vec.x, vec.y}); } // 0x77E2DD177910E1CF 0x54E75C7D b323
-    /// p2 maybe z float?
-    pub inline fn setFakeGpsPlayerPositionThisFrame(vec: types.Vector2, p_2: types.Any) void { invoker.invoke(void, 0xA17784FCA9548D15, .{vec.x, vec.y, p_2}); } // 0xA17784FCA9548D15  b877
+    pub inline fn setFakeGpsPlayerPositionThisFrame(vec: types.Vector3) void { invoker.invoke(void, 0xA17784FCA9548D15, .{vec.x, vec.y, vec.z}); } // 0xA17784FCA9548D15  b877
     pub inline fn isPausemapInInteriorMode() windows.BOOL { return invoker.invoke(windows.BOOL, 0x9049FE339D5F6F6F, .{}); } // 0x9049FE339D5F6F6F 0x199DED14 b323
     pub inline fn hideMinimapExteriorMapThisFrame() void { invoker.invoke(void, 0x5FBAE526203990C9, .{}); } // 0x5FBAE526203990C9 0x1A4318F7 b323
     pub inline fn hideMinimapInteriorMapThisFrame() void { invoker.invoke(void, 0x20FE7FDFEEAD38C0, .{}); } // 0x20FE7FDFEEAD38C0 0xCE36E3FE b323
@@ -4910,6 +4903,7 @@ pub const Hud = struct
     /// 
     /// These integers also work for the `SHOW_HUD_COMPONENT_THIS_FRAME` native, but instead shows the HUD Component.
     pub inline fn hideHudComponentThisFrame(id: c_int) void { invoker.invoke(void, 0x6806C51AD12B83B8, .{id}); } // 0x6806C51AD12B83B8 0xDB2D0762 b323
+    pub inline fn isHudComponentHiddenThisFrame(id: c_int) windows.BOOL { return invoker.invoke(windows.BOOL, 0x8EDC335C943465C8, .{id}); } // 0x8EDC335C943465C8  b3717
     /// This function hides various HUD (Heads-up Display) components. \
     /// Listed below are the integers and the corresponding HUD component. \
     /// - 1 : WANTED_STARS \
@@ -6564,7 +6558,7 @@ pub const Money = struct
     pub inline fn networkSpentMoveSubmarine(p_0: types.Any, p_1: types.Any, p_2: types.Any) void { invoker.invoke(void, 0xCD4D66B43B1DD28D, .{p_0, p_1, p_2}); } // 0xCD4D66B43B1DD28D  b2189
     pub inline fn networkSpentPlayerHealthcare(p_0: c_int, p_1: c_int, p_2: windows.BOOL, p_3: windows.BOOL) void { invoker.invoke(void, 0x7C99101F7FCE2EE5, .{p_0, p_1, p_2, p_3}); } // 0x7C99101F7FCE2EE5 0x3D96A21C b323
     pub inline fn networkSpentNoCops(p_0: types.Any, p_1: windows.BOOL, p_2: windows.BOOL, p_3: types.Any) void { invoker.invoke(void, 0xD5BB406F4E04019F, .{p_0, p_1, p_2, p_3}); } // 0xD5BB406F4E04019F 0x2E51C61C b323
-    pub inline fn networkSpentCargoSourcing(p_0: types.Any, p_1: types.Any, p_2: types.Any, p_3: types.Any, p_4: types.Any, p_5: types.Any) void { invoker.invoke(void, 0x948705F6F9C50824, .{p_0, p_1, p_2, p_3, p_4, p_5}); } // 0x948705F6F9C50824  b2699
+    pub inline fn networkSpentCargoSourcing(p_0: types.Any, p_1: types.Any, p_2: types.Any, p_3: types.Any, p_4: types.Any, p_5: types.Any, p_6: types.Any) void { invoker.invoke(void, 0x948705F6F9C50824, .{p_0, p_1, p_2, p_3, p_4, p_5, p_6}); } // 0x948705F6F9C50824  b2699
     pub inline fn networkSpentRequestJob(p_0: types.Any, p_1: windows.BOOL, p_2: windows.BOOL, p_3: types.Any) void { invoker.invoke(void, 0x8204DA7934DF3155, .{p_0, p_1, p_2, p_3}); } // 0x8204DA7934DF3155 0xD57A5125 b323
     pub inline fn networkSpentRequestHeist(p_0: types.Any, p_1: windows.BOOL, p_2: windows.BOOL, p_3: types.Any) void { invoker.invoke(void, 0x9D26502BB97BFE62, .{p_0, p_1, p_2, p_3}); } // 0x9D26502BB97BFE62 0xF4287778 b323
     /// The first parameter is the amount spent which is store in a global when this native is called. The global returns 10. Which is the price for both rides.
@@ -6795,7 +6789,7 @@ pub const Money = struct
     pub inline fn networkEarnSmugglerOps_(p_0: types.Any, p_1: types.Any, p_2: types.Any) void { invoker.invoke(void, 0xDEA273D5F8A9661A, .{p_0, p_1, p_2}); } // 0xDEA273D5F8A9661A  b2944
     pub inline fn networkEarnBonusObjective_(amount: c_int, p_1: types.Any, p_2: types.Any) void { invoker.invoke(void, 0xDCEF983C24191997, .{amount, p_1, p_2}); } // 0xDCEF983C24191997  b2944
     pub inline fn networkEarnProgressHub_(p_0: types.Any, p_1: types.Any) void { invoker.invoke(void, 0xF8332B06F0EECC9C, .{p_0, p_1}); } // 0xF8332B06F0EECC9C  b2944
-    pub inline fn networkSpentAirFreight_(hangar_cargo_sourcing_price: c_int, from_bank: windows.BOOL, from_bank_and_wallet: windows.BOOL, cost: c_int, warehouse_id: c_int, warehouse_slot: c_int) void { invoker.invoke(void, 0x8C7E8D6F96C9E948, .{hangar_cargo_sourcing_price, from_bank, from_bank_and_wallet, cost, warehouse_id, warehouse_slot}); } // 0x8C7E8D6F96C9E948  b2944
+    pub inline fn networkSpentAirFreight_(hangar_cargo_sourcing_price: c_int, from_bank: windows.BOOL, from_bank_and_wallet: windows.BOOL, cost: c_int, warehouse_id: c_int, warehouse_slot: c_int, p_6: types.Any) void { invoker.invoke(void, 0x8C7E8D6F96C9E948, .{hangar_cargo_sourcing_price, from_bank, from_bank_and_wallet, cost, warehouse_id, warehouse_slot, p_6}); } // 0x8C7E8D6F96C9E948  b2944
     pub inline fn networkSpentSkipCargoSourceSetup_(amount: c_int, from_bank: windows.BOOL, from_bank_and_wallet: windows.BOOL, cost: c_int) void { invoker.invoke(void, 0xED1B407BADA42CEC, .{amount, from_bank, from_bank_and_wallet, cost}); } // 0xED1B407BADA42CEC  b2944
     /// Hash p3 = STEALTH_MODULE
     pub inline fn networkSpentStealthModule_(amount: c_int, from_bank: windows.BOOL, from_bank_and_wallet: windows.BOOL, p_3: types.Hash) void { invoker.invoke(void, 0x95CE79A6939C537A, .{amount, from_bank, from_bank_and_wallet, p_3}); } // 0x95CE79A6939C537A  b2944
@@ -6869,6 +6863,7 @@ pub const Netshopping = struct
     pub inline fn netGameserverBasketIsFull() windows.BOOL { return invoker.invoke(windows.BOOL, 0x27F76CC6C55AD30E, .{}); } // 0x27F76CC6C55AD30E  b323
     pub inline fn netGameserverBasketApplyServerData(p_0: types.Any, p_1: [*c]types.Any) windows.BOOL { return invoker.invoke(windows.BOOL, 0xE1A0450ED46A7812, .{p_0, p_1}); } // 0xE1A0450ED46A7812  b323
     pub inline fn netGameserverCheckoutStart(transaction_id: c_int) windows.BOOL { return invoker.invoke(windows.BOOL, 0x39BE7CEA8D9CC8E6, .{transaction_id}); } // 0x39BE7CEA8D9CC8E6  b323
+    pub inline fn netGameserverCheckoutPending(transaction_id: c_int) windows.BOOL { return invoker.invoke(windows.BOOL, 0x4B64CD6D18474126, .{transaction_id}); } // 0x4B64CD6D18474126  b3570
     pub inline fn netGameserverBeginService(transaction_id: [*c]c_int, category_hash: types.Hash, item_hash: types.Hash, action_type_hash: types.Hash, value: c_int, flags: c_int) windows.BOOL { return invoker.invoke(windows.BOOL, 0x3C5FD37B5499582E, .{transaction_id, category_hash, item_hash, action_type_hash, value, flags}); } // 0x3C5FD37B5499582E  b323
     pub inline fn netGameserverEndService(transaction_id: c_int) windows.BOOL { return invoker.invoke(windows.BOOL, 0xE2A99A9B524BEFFF, .{transaction_id}); } // 0xE2A99A9B524BEFFF  b323
     pub inline fn netGameserverDeleteCharacter(slot: c_int, transfer: windows.BOOL, reason: types.Hash) windows.BOOL { return invoker.invoke(windows.BOOL, 0x51F1A8E48C3D2F6D, .{slot, transfer, reason}); } // 0x51F1A8E48C3D2F6D  b323
@@ -6976,6 +6971,9 @@ pub const Network = struct
     /// 
     /// Returns 1 if the multiplayer is loaded, otherwhise 0.
     pub inline fn networkCanAccessMultiplayer(loading_state: [*c]c_int) windows.BOOL { return invoker.invoke(windows.BOOL, 0xAF50DA1A3F8B1BA4, .{loading_state}); } // 0xAF50DA1A3F8B1BA4 0xA520B982 b323
+    pub inline fn networkCheckCanAccessAndAlert() windows.BOOL { return invoker.invoke(windows.BOOL, 0x6FA9825D0B5A721B, .{}); } // 0x6FA9825D0B5A721B  b3570
+    pub inline fn networkGetAccessCodeLabelHeading_(access_code: c_int) [*c]const u8 { return invoker.invoke([*c]const u8, 0x967E6FB554E1B6DE, .{access_code}); } // 0x967E6FB554E1B6DE  b3570
+    pub inline fn networkGetAccessCodeLabelBody_(access_code: c_int) [*c]const u8 { return invoker.invoke([*c]const u8, 0x214CA1730793EBA8, .{access_code}); } // 0x214CA1730793EBA8  b3570
     pub inline fn networkIsMultiplayerDisabled() windows.BOOL { return invoker.invoke(windows.BOOL, 0x9747292807126EDA, .{}); } // 0x9747292807126EDA 0x05518C0F b323
     pub inline fn networkCanEnterMultiplayer() windows.BOOL { return invoker.invoke(windows.BOOL, 0x7E782A910C362C25, .{}); } // 0x7E782A910C362C25 0x4A23B9C9 b323
     pub inline fn networkSessionDoFreeroamQuickmatch(p_0: types.Any, p_1: types.Any, p_2: types.Any) windows.BOOL { return invoker.invoke(windows.BOOL, 0x330ED4D05491934F, .{p_0, p_1, p_2}); } // 0x330ED4D05491934F  b323
@@ -6993,11 +6991,6 @@ pub const Network = struct
     pub inline fn networkSessionIsSolo() windows.BOOL { return invoker.invoke(windows.BOOL, 0xF3929C2379B60CCE, .{}); } // 0xF3929C2379B60CCE 0x3D2C1916 b323
     pub inline fn networkSessionIsPrivate() windows.BOOL { return invoker.invoke(windows.BOOL, 0xCEF70AA5B3F89BA1, .{}); } // 0xCEF70AA5B3F89BA1 0xDB67785D b323
     pub inline fn networkSessionLeaveIncludingReason_(leave_flags: c_int, leave_reason: c_int) windows.BOOL { return invoker.invoke(windows.BOOL, 0xE0128328CF1FD9F4, .{leave_flags, leave_reason}); } // 0xE0128328CF1FD9F4  b3095
-    /// p0 is always false and p1 varies. \
-    /// NETWORK_SESSION_END(0, 1) \
-    /// NETWORK_SESSION_END(0, 0) \
-    /// Results in: "Connection to session lost due to an unknown network error. Please return to Grand Theft Auto V and try again later."
-    pub inline fn networkSessionEnd(p_0: windows.BOOL, p_1: windows.BOOL) windows.BOOL { return invoker.invoke(windows.BOOL, 0xA02E59562D711006, .{p_0, p_1}); } // 0xA02E59562D711006 0xBCACBEA2 b323
     pub inline fn networkSessionLeave(p_0: types.Any) windows.BOOL { return invoker.invoke(windows.BOOL, 0xB9351A07A0D458B1, .{p_0}); } // 0xB9351A07A0D458B1  b2060
     /// Only works as host.
     pub inline fn networkSessionKickPlayer(player: types.Player) void { invoker.invoke(void, 0xFA8904DC5F304220, .{player}); } // 0xFA8904DC5F304220 0x1E20138A b323
@@ -7284,6 +7277,10 @@ pub const Network = struct
     pub inline fn networkRegisterHighFrequencyHostBroadcastVariables(p_0: types.Any, p_1: types.Any, p_2: types.Any) void { invoker.invoke(void, 0xEA8C0DDB10E2822A, .{p_0, p_1, p_2}); } // 0xEA8C0DDB10E2822A  b1868
     pub inline fn networkRegisterHighFrequencyPlayerBroadcastVariables(p_0: types.Any, p_1: types.Any, p_2: types.Any) void { invoker.invoke(void, 0xD6D7478CA62B8D41, .{p_0, p_1, p_2}); } // 0xD6D7478CA62B8D41  b1868
     pub inline fn networkFinishBroadcastingData() void { invoker.invoke(void, 0x64F62AFB081E260D, .{}); } // 0x64F62AFB081E260D 0xA71A1D2A b323
+    pub inline fn networkGetHostBroadcastDataSizeUnsynced_(script_name_hash: types.Hash, instance: c_int, position_hash: types.Hash, handler_num: c_int) c_int { return invoker.invoke(c_int, 0x72C8588ABE22C972, .{script_name_hash, instance, position_hash, handler_num}); } // 0x72C8588ABE22C972  b3586
+    pub inline fn networkGetPlayerBroadcastDataSizeUnsynced_(script_name_hash: types.Hash, instance: c_int, position_hash: types.Hash, handler_num: c_int) c_int { return invoker.invoke(c_int, 0xB99CD664FD4720A1, .{script_name_hash, instance, position_hash, handler_num}); } // 0xB99CD664FD4720A1  b3586
+    pub inline fn networkGetBroadcastDataHostUpdateSize_(script_name_hash: types.Hash, instance: c_int, position_hash: types.Hash, handler_num: c_int) c_int { return invoker.invoke(c_int, 0xE448693B3EA3B92C, .{script_name_hash, instance, position_hash, handler_num}); } // 0xE448693B3EA3B92C  b3586
+    pub inline fn networkGetBroadcastDataPlayerUpdateSize_(script_name_hash: types.Hash, instance: c_int, position_hash: types.Hash, handler_num: c_int) c_int { return invoker.invoke(c_int, 0xAC3F722321800755, .{script_name_hash, instance, position_hash, handler_num}); } // 0xAC3F722321800755  b3586
     pub inline fn networkHasReceivedHostBroadcastData() windows.BOOL { return invoker.invoke(windows.BOOL, 0x5D10B3795F3FC886, .{}); } // 0x5D10B3795F3FC886 0x0B739F53 b323
     pub inline fn networkGetPlayerIndex(player: types.Player) types.Player { return invoker.invoke(types.Player, 0x24FB80D107371267, .{player}); } // 0x24FB80D107371267 0xBE1C1506 b323
     pub inline fn networkGetParticipantIndex(index: c_int) c_int { return invoker.invoke(c_int, 0x1B84DF6AF2A46938, .{index}); } // 0x1B84DF6AF2A46938 0xC4D91094 b323
@@ -7305,6 +7302,7 @@ pub const Network = struct
     /// instance_id = -1 \
     /// position_hash = 0
     pub inline fn networkGetHostOfScript(script_name: [*c]const u8, instance__id: c_int, position__hash: c_int) types.Player { return invoker.invoke(types.Player, 0x1D6A14F1F9A736FC, .{script_name, instance__id, position__hash}); } // 0x1D6A14F1F9A736FC 0x9C95D0BB b323
+    pub inline fn networkGetHostOfThread(thread_id: c_int) types.Player { return invoker.invoke(types.Player, 0xD3DEBE2991FE8098, .{thread_id}); } // 0xD3DEBE2991FE8098  b3717
     pub inline fn networkSetMissionFinished() void { invoker.invoke(void, 0x3B3D11CD9FFCDFC9, .{}); } // 0x3B3D11CD9FFCDFC9 0x3083FAD7 b323
     pub inline fn networkIsScriptActive(script_name: [*c]const u8, instance__id: c_int, p_2: windows.BOOL, position__hash: c_int) windows.BOOL { return invoker.invoke(windows.BOOL, 0x9D40DF90FAD26098, .{script_name, instance__id, p_2, position__hash}); } // 0x9D40DF90FAD26098 0x4A65250C b323
     pub inline fn networkIsScriptActiveByHash(script_hash: types.Hash, p_1: c_int, p_2: windows.BOOL, p_3: c_int) windows.BOOL { return invoker.invoke(windows.BOOL, 0xDA7DE67F5FE5EE13, .{script_hash, p_1, p_2, p_3}); } // 0xDA7DE67F5FE5EE13  b2245
@@ -7466,8 +7464,9 @@ pub const Network = struct
     pub inline fn networkGetPlayerOwnsWaypoint(player: types.Player) windows.BOOL { return invoker.invoke(windows.BOOL, 0x82377B65E943F72D, .{player}); } // 0x82377B65E943F72D 0xB802B671 b323
     pub inline fn networkCanSetWaypoint() windows.BOOL { return invoker.invoke(windows.BOOL, 0xC927EC229934AF60, .{}); } // 0xC927EC229934AF60 0x009E68F3 b323
     pub inline fn networkIgnoreRemoteWaypoints() void { invoker.invoke(void, 0x4C2A9FDC22377075, .{}); } // 0x4C2A9FDC22377075  b372
-    /// communicationType: 0 = VOICE; 1 = TEXT_CHAT; 2 = TEXT_MESSAGE; 3 = EMAIL; 4 = USER_CONTENT;  5 = USER_TEXT
-    pub inline fn networkDoesCommunicationGroupExist_(communication_type: c_int) windows.BOOL { return invoker.invoke(windows.BOOL, 0xDBDF80673BBA3D65, .{communication_type}); } // 0xDBDF80673BBA3D65  b3095
+    /// communicationType: 0 = VOICE; 1 = TEXT_CHAT; 2 = TEXT_MESSAGE; 3 = EMAIL; 4 = USER_CONTENT; 5 = USER_TEXT
+    pub inline fn networkDoesCommunicationGroupHavePermission_(communication_type: c_int) windows.BOOL { return invoker.invoke(windows.BOOL, 0xDBDF80673BBA3D65, .{communication_type}); } // 0xDBDF80673BBA3D65  b3095
+    pub inline fn networkDoesCommunicationGroupHaveSettingsEnabled_(communication_type: c_int) windows.BOOL { return invoker.invoke(windows.BOOL, 0x20C12650830A64EC, .{communication_type}); } // 0x20C12650830A64EC  b3570
     /// Returns communicationGroupFlag \
     /// communicationType: see 0xDBDF80673BBA3D65
     /// 
@@ -7483,6 +7482,8 @@ pub const Network = struct
     ///     COMMUNICATION_GROUP_INVALID = 1 << 7,
     /// };
     pub inline fn networkGetCommunicationGroupFlags_(communication_type: c_int) c_int { return invoker.invoke(c_int, 0x40DF02F371F40883, .{communication_type}); } // 0x40DF02F371F40883  b3095
+    pub inline fn networkGetCommunicationGroupDefaultFlags_(communication_type: c_int) c_int { return invoker.invoke(c_int, 0x97F35B898D2D067F, .{communication_type}); } // 0x97F35B898D2D067F  b3570
+    pub inline fn networkGetCommunicationGroupValue_(communication_type: c_int) c_int { return invoker.invoke(c_int, 0xBF66ACD9AE81A99F, .{communication_type}); } // 0xBF66ACD9AE81A99F  b3570
     /// communicationType: see 0xDBDF80673BBA3D65 \
     /// communicationGroupFlag: see 0x40DF02F371F40883
     pub inline fn networkSetCommunicationGroupFlags_(communication_type: c_int, communication_group_flag: c_int) void { invoker.invoke(void, 0xE549F846DE7D32D5, .{communication_type, communication_group_flag}); } // 0xE549F846DE7D32D5  b3095
@@ -7643,6 +7644,8 @@ pub const Network = struct
     /// Getter for SET_NETWORK_CUTSCENE_ENTITIES.
     pub inline fn areCutsceneEntitiesNetworked() windows.BOOL { return invoker.invoke(windows.BOOL, 0x66D6A5E9C511214A, .{}); } // 0x66D6A5E9C511214A  b2699
     pub inline fn setNetworkIdPassControlInTutorial(net_id: c_int, state: windows.BOOL) void { invoker.invoke(void, 0x3FA36981311FA4FF, .{net_id, state}); } // 0x3FA36981311FA4FF 0x00AE4E17 b323
+    pub inline fn networkSetTutorialSpecialSession_(toggle: windows.BOOL) void { invoker.invoke(void, 0x35AEB4AC7C73C6E1, .{toggle}); } // 0x35AEB4AC7C73C6E1  b3717
+    pub inline fn networkIsSpecialTutorialSession_() windows.BOOL { return invoker.invoke(windows.BOOL, 0x4666CD7431DE98E2, .{}); } // 0x4666CD7431DE98E2  b3717
     pub inline fn isNetworkIdOwnedByParticipant(net_id: c_int) windows.BOOL { return invoker.invoke(windows.BOOL, 0xA1607996431332DF, .{net_id}); } // 0xA1607996431332DF 0xEA5176C0 b323
     pub inline fn setRemotePlayerVisibleInCutscene(player: types.Player, locally_visible: windows.BOOL) void { invoker.invoke(void, 0x96320E6549DAE7B4, .{player, locally_visible}); } // 0x96320E6549DAE7B4  b2802
     pub inline fn setLocalPlayerVisibleInCutscene(p_0: windows.BOOL, p_1: windows.BOOL) void { invoker.invoke(void, 0xD1065D68947E7B6E, .{p_0, p_1}); } // 0xD1065D68947E7B6E 0x59F3479B b323
@@ -7703,9 +7706,7 @@ pub const Network = struct
     pub inline fn networkSetObjectScopeDistance(object: types.Object, range: f32) void { invoker.invoke(void, 0xBA7F0B77D80A4EB7, .{object, range}); } // 0xBA7F0B77D80A4EB7  b372
     pub inline fn networkAllowCloningWhileInTutorial(p_0: types.Any, p_1: types.Any) void { invoker.invoke(void, 0x0F1A4B45B7693B95, .{p_0, p_1}); } // 0x0F1A4B45B7693B95  b2189
     /// A value between 1.0 and 5.0
-    /// 
-    /// _NETWORK_SET_TASK_CUTSCENE_PROXIMITY_SCALE?
-    pub inline fn networkSetTaskCutsceneInscopeMultipler(p_0: types.Any) void { invoker.invoke(void, 0xC6FCEE21C6FCEE21, .{p_0}); } // 0xC6FCEE21C6FCEE21  b2545
+    pub inline fn networkSetTaskCutsceneInscopeMultipler(multiplier: f32) void { invoker.invoke(void, 0xC6FCEE21C6FCEE21, .{multiplier}); } // 0xC6FCEE21C6FCEE21  b2545
     pub inline fn networkHideEntityInTutorialSession_(net_handle: c_int, hide: windows.BOOL) void { invoker.invoke(void, 0xCFE359CCCFE359CC, .{net_handle, hide}); } // 0xCFE359CCCFE359CC  b3258
     pub inline fn getNetworkTime() c_int { return invoker.invoke(c_int, 0x7A5487FE9FAA6B48, .{}); } // 0x7A5487FE9FAA6B48 0x998103C2 b323
     /// Returns the same value as GET_NETWORK_TIME in freemode, but as opposed to `GET_NETWORK_TIME` it always gets the most recent time, instead of once per tick. \
@@ -7824,6 +7825,9 @@ pub const Network = struct
     pub inline fn networkOverrideClockTime(hours: c_int, minutes: c_int, seconds: c_int) void { invoker.invoke(void, 0xE679E3E06E363892, .{hours, minutes, seconds}); } // 0xE679E3E06E363892 0xC077BCD6 b323
     pub inline fn networkOverrideClockRate(ms: c_int) void { invoker.invoke(void, 0x42BF1D2E723B6D7E, .{ms}); } // 0x42BF1D2E723B6D7E  b2189
     pub inline fn networkClearClockTimeOverride() void { invoker.invoke(void, 0xD972DF67326F966E, .{}); } // 0xD972DF67326F966E 0xC4AEAF49 b323
+    pub inline fn networkClearClockSyncTimeOverride_(start_global_transition: windows.BOOL, transition_time: c_int) void { invoker.invoke(void, 0x0C1BF187985B15C8, .{start_global_transition, transition_time}); } // 0x0C1BF187985B15C8  b3717
+    /// Does nothing in final builds.
+    pub inline fn networkSyncClockTimeOverride() void { invoker.invoke(void, 0xCBD02360C5E16871, .{}); } // 0xCBD02360C5E16871  b3570
     pub inline fn networkIsClockTimeOverridden() windows.BOOL { return invoker.invoke(windows.BOOL, 0xD7C95D322FF57522, .{}); } // 0xD7C95D322FF57522 0x2465296D b323
     pub inline fn networkAddEntityArea(vec_1__: types.Vector3, vec_2__: types.Vector3) c_int { return invoker.invoke(c_int, 0x494C8FB299290269, .{vec_1__.x, vec_1__.y, vec_1__.z, vec_2__.x, vec_2__.y, vec_2__.z}); } // 0x494C8FB299290269 0x51030E5B b323
     /// To remove, see: NETWORK_REMOVE_ENTITY_AREA \
@@ -7917,15 +7921,13 @@ pub const Network = struct
     pub inline fn networkOverrideCoordsAndHeading(entity: types.Entity, vec: types.Vector3, heading: f32) void { invoker.invoke(void, 0xA7E30DE9272B6D49, .{entity, vec.x, vec.y, vec.z, heading}); } // 0xA7E30DE9272B6D49 0x644141C5 b323
     pub inline fn networkEnableExtraVehicleOrientationBlendChecks(net_id: c_int, toggle: windows.BOOL) void { invoker.invoke(void, 0xE6717E652B8C8D8A, .{net_id, toggle}); } // 0xE6717E652B8C8D8A  b617
     pub inline fn networkDisableProximityMigration(net_i_d: c_int) void { invoker.invoke(void, 0x407091CF6037118E, .{net_i_d}); } // 0x407091CF6037118E 0x9F82917F b323
-    /// value must be < 255
-    pub inline fn networkSetPropertyId(id: c_int) void { invoker.invoke(void, 0x1775961C2FBBCB5C, .{id}); } // 0x1775961C2FBBCB5C 0x5A74E873 b323
-    pub inline fn networkClearPropertyId() void { invoker.invoke(void, 0xC2B82527CA77053E, .{}); } // 0xC2B82527CA77053E 0x38BC35C8 b323
     /// p0 in the decompiled scripts is always the stat mesh_texblend * 0.07 to int
     pub inline fn networkSetPlayerMentalState(p_0: c_int) void { invoker.invoke(void, 0x367EF5E2F439B4C6, .{p_0}); } // 0x367EF5E2F439B4C6 0x53C9563C b323
     pub inline fn networkSetMinimumRankForMission(p_0: windows.BOOL) void { invoker.invoke(void, 0x94538037EE44F5CF, .{p_0}); } // 0x94538037EE44F5CF 0x6B97075B b323
     pub inline fn networkCacheLocalPlayerHeadBlendData() void { invoker.invoke(void, 0xBD0BE0BFC927EAC1, .{}); } // 0xBD0BE0BFC927EAC1 0x94AB35A9 b323
     pub inline fn networkHasCachedPlayerHeadBlendData(player: types.Player) windows.BOOL { return invoker.invoke(windows.BOOL, 0x237D5336A9A54108, .{player}); } // 0x237D5336A9A54108 0x7B2A0337 b323
     pub inline fn networkApplyCachedPlayerHeadBlendData(ped: types.Ped, player: types.Player) windows.BOOL { return invoker.invoke(windows.BOOL, 0x99B72C7ABDE5C910, .{ped, player}); } // 0x99B72C7ABDE5C910 0x99F58A07 b323
+    pub inline fn networkSetIgnoreVehicleRammedByNonVehicle_(toggle: windows.BOOL) void { invoker.invoke(void, 0x67F7C81C1395672A, .{toggle}); } // 0x67F7C81C1395672A  b3717
     pub inline fn getNumCommerceItems() c_int { return invoker.invoke(c_int, 0xF2EAC213D5EA0623, .{}); } // 0xF2EAC213D5EA0623 0x965EA007 b323
     pub inline fn isCommerceDataValid() windows.BOOL { return invoker.invoke(windows.BOOL, 0xEA14EEF5B7CD2C30, .{}); } // 0xEA14EEF5B7CD2C30 0xEEFC8A55 b323
     /// Does nothing (it's a nullsub).
@@ -8119,6 +8121,7 @@ pub const Network = struct
     pub inline fn networkGetUnreliableResendCount(player: types.Player) c_int { return invoker.invoke(c_int, 0x3765C3A3E8192E10, .{player}); } // 0x3765C3A3E8192E10  b323
     pub inline fn networkGetHighestReliableResendCount(player: types.Player) c_int { return invoker.invoke(c_int, 0x52C1EADAF7B10302, .{player}); } // 0x52C1EADAF7B10302  b323
     pub inline fn networkReportCodeTamper() void { invoker.invoke(void, 0x5626D9D6810730D5, .{}); } // 0x5626D9D6810730D5  b350
+    pub inline fn networkGetDumpOfAssetVerifier_(p_0: [*c]types.Any) void { invoker.invoke(void, 0x69D05E1EAD74B9DD, .{p_0}); } // 0x69D05E1EAD74B9DD  b3717
     pub inline fn networkGetLastEntityPosReceivedOverNetwork(entity: types.Entity) types.Vector3 { return invoker.invoke(types.Vector3, 0x64D779659BC37B19, .{entity}); } // 0x64D779659BC37B19  b393
     /// Returns the coordinates of another player. \
     /// Does not work if you enter your own player id as p0 (will return `(0.0, 0.0, 0.0)` in that case).
@@ -8133,6 +8136,7 @@ pub const Network = struct
     /// Does nothing (it's a nullsub).
     pub inline fn networkGetNetStatisticsInfo(p_0: [*c]types.Any) void { invoker.invoke(void, 0x6FD992C4A1C1B986, .{p_0}); } // 0x6FD992C4A1C1B986  b323
     pub inline fn networkGetPlayerAccountId(player: types.Player) c_int { return invoker.invoke(c_int, 0xDB663CC9FF3407A9, .{player}); } // 0xDB663CC9FF3407A9  b1734
+    pub inline fn networkHasScMembership() windows.BOOL { return invoker.invoke(windows.BOOL, 0xAB286B2192A71E32, .{}); } // 0xAB286B2192A71E32  b3717
     pub inline fn networkUgcNav(p_0: types.Any, p_1: types.Any) void { invoker.invoke(void, 0xC1447451DDB512F0, .{p_0, p_1}); } // 0xC1447451DDB512F0  b2372
     /// enum eNetworkGameRestartReason \
     /// { \
@@ -8534,7 +8538,6 @@ pub const Object = struct
     /// Full list of pickup types by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/pickupTypes.json
     pub inline fn convertOldPickupTypeToNew(pickup_hash: types.Hash) types.Hash { return invoker.invoke(types.Hash, 0x5EAAD83F8CFB4575, .{pickup_hash}); } // 0x5EAAD83F8CFB4575 0x6AE36192 b323
     pub inline fn setForceObjectThisFrame(vec: types.Vector3, p_3: f32) void { invoker.invoke(void, 0xF538081986E49E9D, .{vec.x, vec.y, vec.z, p_3}); } // 0xF538081986E49E9D 0x3DA41C1A b323
-    /// is this like setting is as no longer needed?
     pub inline fn onlyCleanUpObjectWhenOutOfRange(object: types.Object) void { invoker.invoke(void, 0xADBE4809F19F927A, .{object}); } // 0xADBE4809F19F927A 0x2048A7DD b323
     pub inline fn setDisableCollisionsBetweenCarsAndCarParachute(p_0: types.Any) void { invoker.invoke(void, 0x8CAAB2BD3EA58BD4, .{p_0}); } // 0x8CAAB2BD3EA58BD4  b1011
     pub inline fn setProjectilesShouldExplodeOnContact(entity: types.Entity, p_1: types.Any) void { invoker.invoke(void, 0x63ECF581BC70E363, .{entity, p_1}); } // 0x63ECF581BC70E363  b1365
@@ -8689,6 +8692,8 @@ pub const Pad = struct
     pub inline fn shutdownPcScriptedControls() void { invoker.invoke(void, 0x643ED62D5EA3BEBD, .{}); } // 0x643ED62D5EA3BEBD 0x42140FF9 b323
     /// control: see IS_CONTROL_ENABLED
     pub inline fn allowAlternativeScriptControlsLayout(control: c_int) void { invoker.invoke(void, 0x7F4724035FDCA1DD, .{control}); } // 0x7F4724035FDCA1DD 0x2CEDE6C5 b323
+    /// Always returns zero.
+    pub inline fn getGamepadType_() c_int { return invoker.invoke(c_int, 0x18E474F40EF05F10, .{}); } // 0x18E474F40EF05F10  b3570
 };
 
 pub const Pathfind = struct
@@ -10273,6 +10278,7 @@ pub const Ped = struct
     pub inline fn setPedCanPlayAmbientBaseAnims(ped: types.Ped, toggle: windows.BOOL) void { invoker.invoke(void, 0x0EB0585D15254740, .{ped, toggle}); } // 0x0EB0585D15254740 0x5720A5DD b323
     pub inline fn triggerIdleAnimationOnPed(ped: types.Ped) void { invoker.invoke(void, 0xC2EE020F5FB4DB53, .{ped}); } // 0xC2EE020F5FB4DB53 0xB7CD0A49 b323
     pub inline fn setPedCanArmIk(ped: types.Ped, toggle: windows.BOOL) void { invoker.invoke(void, 0x6C3B4D6D13B4C841, .{ped, toggle}); } // 0x6C3B4D6D13B4C841 0x343B4DE0 b323
+    pub inline fn setPedCanBodyRecoilIk(ped: types.Ped, toggle: windows.BOOL) void { invoker.invoke(void, 0xE84EC1735FB39663, .{ped, toggle}); } // 0xE84EC1735FB39663  b3717
     pub inline fn setPedCanHeadIk(ped: types.Ped, toggle: windows.BOOL) void { invoker.invoke(void, 0xC11C18092C5530DC, .{ped, toggle}); } // 0xC11C18092C5530DC 0xD3B04476 b323
     pub inline fn setPedCanLegIk(ped: types.Ped, toggle: windows.BOOL) void { invoker.invoke(void, 0x73518ECE2485412B, .{ped, toggle}); } // 0x73518ECE2485412B 0x9955BC6F b323
     pub inline fn setPedCanTorsoIk(ped: types.Ped, toggle: windows.BOOL) void { invoker.invoke(void, 0xF2B7106D37947CE0, .{ped, toggle}); } // 0xF2B7106D37947CE0 0x8E5D4EAB b323
@@ -10815,7 +10821,6 @@ pub const Ped = struct
     pub inline fn setPedDiesInstantlyInWater(ped: types.Ped, toggle: windows.BOOL) void { invoker.invoke(void, 0xEEB64139BA29A7CF, .{ped, toggle}); } // 0xEEB64139BA29A7CF 0xFE2554FC b323
     /// Only appears in lamar1 script.
     pub inline fn setLadderClimbInputState(ped: types.Ped, p_1: c_int) void { invoker.invoke(void, 0x1A330D297AAC6BC1, .{ped, p_1}); } // 0x1A330D297AAC6BC1 0x77BB7CB8 b323
-    pub inline fn isPedInSphereAreaOfAnyEnemyPeds(ped: types.Ped, vec: types.Vector3, range: f32) windows.BOOL { return invoker.invoke(windows.BOOL, 0x082D79E15302F0C2, .{ped, vec.x, vec.y, vec.z, range}); } // 0x082D79E15302F0C2  b3407
     pub inline fn stopPedWeaponFiringWhenDropped(ped: types.Ped) void { invoker.invoke(void, 0xC158D28142A34608, .{ped}); } // 0xC158D28142A34608 0x4AC3421E b323
     pub inline fn setScriptedAnimSeatOffset(ped: types.Ped, p_1: f32) void { invoker.invoke(void, 0x5917BBA32D06C230, .{ped, p_1}); } // 0x5917BBA32D06C230 0x7CEFFA45 b323
     /// enum eCombatMovement // 0x4F456B61 \
@@ -11410,7 +11415,6 @@ pub const Physics = struct
     pub inline fn setDisableBreaking(object: types.Object, toggle: windows.BOOL) void { invoker.invoke(void, 0x5CEC1A84620E7D5B, .{object, toggle}); } // 0x5CEC1A84620E7D5B 0xEE77C326 b323
     pub inline fn resetDisableBreaking(object: types.Object) void { invoker.invoke(void, 0xCC6E963682533882, .{object}); } // 0xCC6E963682533882  b323
     pub inline fn setDisableFragDamage(object: types.Object, toggle: windows.BOOL) void { invoker.invoke(void, 0x01BA3AED21C16CFB, .{object, toggle}); } // 0x01BA3AED21C16CFB 0x97269DC8 b323
-    /// PED_RAGDOLL_BUMP Proof?
     pub inline fn setUseKinematicPhysics(entity: types.Entity, toggle: windows.BOOL) void { invoker.invoke(void, 0x15F944730C832252, .{entity, toggle}); } // 0x15F944730C832252  b463
     pub inline fn setInStuntMode(p_0: windows.BOOL) void { invoker.invoke(void, 0x9EBD751E5787BAF2, .{p_0}); } // 0x9EBD751E5787BAF2  b791
     /// Related to the lower-end of a vehicles fTractionCurve, e.g., from standing starts and acceleration from low/zero speeds.
@@ -11604,9 +11608,6 @@ pub const Player = struct
     /// l_8d._f47 = MISC::GET_RANDOM_FLOAT_IN_RANGE(18.0, 28.0); \
     /// PLAYER::SET_LAW_RESPONSE_DELAY_OVERRIDE((l_8d._f47));
     pub inline fn setLawResponseDelayOverride(p_0: f32) void { invoker.invoke(void, 0xB45EFF719D8427A6, .{p_0}); } // 0xB45EFF719D8427A6 0xBF6993C7 b323
-    /// 2 matches in 1 script - am_hold_up
-    /// 
-    /// Used in multiplayer scripts?
     pub inline fn resetLawResponseDelayOverride() void { invoker.invoke(void, 0x0032A6DBA562C518, .{}); } // 0x0032A6DBA562C518 0x47CAB814 b323
     pub inline fn canPlayerStartMission(player: types.Player) windows.BOOL { return invoker.invoke(windows.BOOL, 0xDE7465A27D403C06, .{player}); } // 0xDE7465A27D403C06 0x39E3CB3F b323
     pub inline fn isPlayerReadyForCutscene(player: types.Player) windows.BOOL { return invoker.invoke(windows.BOOL, 0x908CBECC2CAA3690, .{player}); } // 0x908CBECC2CAA3690 0xBB77E9CD b323
@@ -11839,6 +11840,7 @@ pub const Player = struct
     /// 2 = Free Aim - Assisted \
     /// 3 = Free Aim
     pub inline fn setPlayerTargetingMode(target_mode: c_int) void { invoker.invoke(void, 0xB1906895227793F3, .{target_mode}); } // 0xB1906895227793F3 0x61CAE253 b323
+    pub inline fn getPlayerTargetingMode() c_int { return invoker.invoke(c_int, 0x875BDD898B99C8CE, .{}); } // 0x875BDD898B99C8CE  b3570
     pub inline fn setPlayerTargetLevel(target_level: c_int) void { invoker.invoke(void, 0x5702B917B99DB1CD, .{target_level}); } // 0x5702B917B99DB1CD 0x772DA539 b323
     /// Returns profile setting 237.
     pub inline fn getIsUsingFpsThirdPersonCover() windows.BOOL { return invoker.invoke(windows.BOOL, 0xB9CF1F793A9F1BF1, .{}); } // 0xB9CF1F793A9F1BF1  b323
@@ -12061,14 +12063,7 @@ pub const Player = struct
     pub inline fn setPlayerCanLeaveParachuteSmokeTrail(player: types.Player, enabled: windows.BOOL) void { invoker.invoke(void, 0xF401B182DBA8AF53, .{player, enabled}); } // 0xF401B182DBA8AF53 0x832DEB7A b323
     pub inline fn setPlayerParachuteSmokeTrailColor(player: types.Player, r: c_int, g: c_int, b: c_int) void { invoker.invoke(void, 0x8217FD371A4625CF, .{player, r, g, b}); } // 0x8217FD371A4625CF 0x14FE9264 b323
     pub inline fn getPlayerParachuteSmokeTrailColor(player: types.Player, r: [*c]c_int, g: [*c]c_int, b: [*c]c_int) void { invoker.invoke(void, 0xEF56DBABD3CD4887, .{player, r, g, b}); } // 0xEF56DBABD3CD4887 0xF66E5CDD b323
-    /// example:
-    /// 
-    /// flags: 0-6
-    /// 
-    /// PLAYER::SET_PLAYER_RESET_FLAG_PREFER_REAR_SEATS(PLAYER::PLAYER_ID(), 6);
-    /// 
-    /// wouldnt the flag be the seatIndex?
-    pub inline fn setPlayerPhonePaletteIdx(player: types.Player, flags: c_int) void { invoker.invoke(void, 0x11D5F725F0E780E0, .{player, flags}); } // 0x11D5F725F0E780E0  b323
+    pub inline fn setPlayerPhonePaletteIdx(player: types.Player, idx: c_int) void { invoker.invoke(void, 0x11D5F725F0E780E0, .{player, idx}); } // 0x11D5F725F0E780E0  b323
     pub inline fn setPlayerNoiseMultiplier(player: types.Player, multiplier: f32) void { invoker.invoke(void, 0xDB89EF50FF25FCE9, .{player, multiplier}); } // 0xDB89EF50FF25FCE9 0x15786DD1 b323
     /// Values around 1.0f to 2.0f used in game scripts.
     pub inline fn setPlayerSneakingNoiseMultiplier(player: types.Player, multiplier: f32) void { invoker.invoke(void, 0xB2C1A29588A9F47C, .{player, multiplier}); } // 0xB2C1A29588A9F47C 0x8D2D89C4 b323
@@ -12922,6 +12917,7 @@ pub const Stats = struct
     pub inline fn playstatsQuitMode(p_0: types.Any, p_1: types.Any, p_2: types.Any, p_3: types.Any, p_4: types.Any) void { invoker.invoke(void, 0x5BF29846C6527C54, .{p_0, p_1, p_2, p_3, p_4}); } // 0x5BF29846C6527C54  b1868
     pub inline fn playstatsMissionVote(p_0: types.Any) void { invoker.invoke(void, 0xC03FAB2C2F92289B, .{p_0}); } // 0xC03FAB2C2F92289B  b1868
     pub inline fn playstatsNjvsVote(p_0: types.Any) void { invoker.invoke(void, 0x5CDAED54B34B0ED0, .{p_0}); } // 0x5CDAED54B34B0ED0  b1868
+    pub inline fn playstatsDeathInfo_(victim_ped: types.Ped, killer_ped: types.Ped, mental_state: c_int, revenge_kill: windows.BOOL, victim_kv_k: c_int, killer_kv_k: c_int) void { invoker.invoke(void, 0x01D8B04D02F1217F, .{victim_ped, killer_ped, mental_state, revenge_kill, victim_kv_k, killer_kv_k}); } // 0x01D8B04D02F1217F  b3570
     pub inline fn playstatsFmMissionEnd(p_0: types.Any, p_1: types.Any, p_2: types.Any, p_3: types.Any) void { invoker.invoke(void, 0x46A70777BE6CEAB9, .{p_0, p_1, p_2, p_3}); } // 0x46A70777BE6CEAB9  b2545
     pub inline fn playstatsHeist4Prep(p_0: types.Any) void { invoker.invoke(void, 0xDFCDB14317A9B361, .{p_0}); } // 0xDFCDB14317A9B361  b2189
     pub inline fn playstatsHeist4Finale(p_0: types.Any) void { invoker.invoke(void, 0xC1E963C58664B556, .{p_0}); } // 0xC1E963C58664B556  b2189
@@ -12954,6 +12950,10 @@ pub const Stats = struct
     pub inline fn playstatsShowroomOverview_(data: [*c]types.Any) void { invoker.invoke(void, 0x151D6C04C9E2742F, .{data}); } // 0x151D6C04C9E2742F  b2944
     pub inline fn playstatsPimenuNav_(data: [*c]types.Any) void { invoker.invoke(void, 0xE6D323A5E9EFFB76, .{data}); } // 0xE6D323A5E9EFFB76  b3258
     pub inline fn playstatsRecoverVehicle_(data: [*c]types.Any) void { invoker.invoke(void, 0xBEB0D930B3CCE4D5, .{data}); } // 0xBEB0D930B3CCE4D5  b3258
+    pub inline fn playstatsScriptEventFpom_(data: [*c]types.Any) void { invoker.invoke(void, 0x574A7808450E141C, .{data}); } // 0x574A7808450E141C  b3570
+    pub inline fn playstatsLobbyExit_(p_0: [*c]types.Any) void { invoker.invoke(void, 0x4649D80CE1A35BA1, .{p_0}); } // 0x4649D80CE1A35BA1  b3717
+    pub inline fn playstatsLobbyStarted_(p_0: [*c]types.Any) void { invoker.invoke(void, 0xDC00BB9C27347A8F, .{p_0}); } // 0xDC00BB9C27347A8F  b3717
+    pub inline fn playstatsCreatorEnd_(p_0: [*c]types.Any) void { invoker.invoke(void, 0x72289B8C78B02962, .{p_0}); } // 0x72289B8C78B02962  b3717
 };
 
 pub const Streaming = struct
@@ -13234,8 +13234,11 @@ pub const Streaming = struct
     /// 
     /// Maximum model memory (as defined in common\data\missioncreatordata.meta) is 100 MiB
     pub inline fn getUsedCreatorBudget() f32 { return invoker.invoke(f32, 0x3D3D8B3BE5A83D35, .{}); } // 0x3D3D8B3BE5A83D35 0x3E9C4CBE b323
+    pub inline fn getModelAdditionalCost_(model_hash: types.Hash) f32 { return invoker.invoke(f32, 0x0F7082C60FB479EF, .{model_hash}); } // 0x0F7082C60FB479EF  b3717
+    pub inline fn getTotalModelCost_(model_hash: types.Hash) f32 { return invoker.invoke(f32, 0x4A91423C04BAADA1, .{model_hash}); } // 0x4A91423C04BAADA1  b3717
     /// Enables the specified island. For more information, see islandhopper.meta
     pub inline fn setIslandEnabled(name: [*c]const u8, toggle: windows.BOOL) void { invoker.invoke(void, 0x9A9D1BA639675CF1, .{name, toggle}); } // 0x9A9D1BA639675CF1  b2189
+    pub inline fn setSphericalStreamDistantHilodsThisFrame_() void { invoker.invoke(void, 0x68F1C25420D5F6AA, .{}); } // 0x68F1C25420D5F6AA  b3717
 };
 
 pub const Task = struct
@@ -13272,7 +13275,7 @@ pub const Task = struct
     /// 2 = right back seat \
     /// 3 = outside left \
     /// 4 = outside right
-    pub inline fn taskEnterVehicle(ped: types.Ped, vehicle: types.Vehicle, timeout: c_int, seat: c_int, speed: f32, flag: c_int, override_entry_clipset_name: [*c]const u8, p_7: types.Any) void { invoker.invoke(void, 0xC20E50AA46D09CA8, .{ped, vehicle, timeout, seat, speed, flag, override_entry_clipset_name, p_7}); } // 0xC20E50AA46D09CA8 0xB8689B4E b323
+    pub inline fn taskEnterVehicle(ped: types.Ped, vehicle: types.Vehicle, timeout: c_int, seat: c_int, speed: f32, flag: c_int, override_entry_clipset_name: [*c]const u8) void { invoker.invoke(void, 0xC20E50AA46D09CA8, .{ped, vehicle, timeout, seat, speed, flag, override_entry_clipset_name}); } // 0xC20E50AA46D09CA8 0xB8689B4E b323
     /// Flags from decompiled scripts: \
     /// 0 = normal exit and closes door. \
     /// 1 = normal exit and closes door. \
@@ -13587,6 +13590,7 @@ pub const Task = struct
     pub inline fn taskPerformSequenceLocally(ped: types.Ped, task_sequence_id: c_int) void { invoker.invoke(void, 0x8C33220C8D78CA0D, .{ped, task_sequence_id}); } // 0x8C33220C8D78CA0D  b944
     pub inline fn clearSequenceTask(task_sequence_id: [*c]c_int) void { invoker.invoke(void, 0x3841422E9C488D8C, .{task_sequence_id}); } // 0x3841422E9C488D8C 0x47ED03CE b323
     pub inline fn setSequenceToRepeat(task_sequence_id: c_int, repeat: windows.BOOL) void { invoker.invoke(void, 0x58C70CF3A41E4AE7, .{task_sequence_id, repeat}); } // 0x58C70CF3A41E4AE7 0xCDDF1508 b323
+    pub inline fn setSequencePreventMigration(task_sequence_id: c_int) void { invoker.invoke(void, 0xF5D1F489147CB683, .{task_sequence_id}); } // 0xF5D1F489147CB683  b3570
     /// returned values: \
     /// 0 to 7 = task that's currently in progress, 0 meaning the first one. \
     /// -1 no task sequence in progress.
@@ -14431,6 +14435,7 @@ pub const Task = struct
     pub inline fn taskFollowWaypointRecording(ped: types.Ped, name: [*c]const u8, p_2: c_int, p_3: c_int, p_4: c_int) void { invoker.invoke(void, 0x0759591819534F7B, .{ped, name, p_2, p_3, p_4}); } // 0x0759591819534F7B 0xADF9904D b323
     pub inline fn isWaypointPlaybackGoingOnForPed(ped: types.Ped) windows.BOOL { return invoker.invoke(windows.BOOL, 0xE03B3F2D3DC59B64, .{ped}); } // 0xE03B3F2D3DC59B64 0x85B7725F b323
     pub inline fn getPedWaypointProgress(ped: types.Ped) c_int { return invoker.invoke(c_int, 0x2720AAA75001E094, .{ped}); } // 0x2720AAA75001E094 0x3595B104 b323
+    pub inline fn setPedWaypointProgress(ped: types.Ped, progress: c_int) void { invoker.invoke(void, 0x686ECCD99D4E61BB, .{ped, progress}); } // 0x686ECCD99D4E61BB  b3570
     pub inline fn getPedWaypointDistance(p_0: types.Any) f32 { return invoker.invoke(f32, 0xE6A877C64CAF1BC5, .{p_0}); } // 0xE6A877C64CAF1BC5 0x084B35B0 b323
     pub inline fn setPedWaypointRouteOffset(ped: types.Ped, vec: types.Vector3) windows.BOOL { return invoker.invoke(windows.BOOL, 0xED98E10B0AFCE4B4, .{ped, vec.x, vec.y, vec.z}); } // 0xED98E10B0AFCE4B4 0xF867F747 b323
     pub inline fn getWaypointDistanceAlongRoute(name: [*c]const u8, point: c_int) f32 { return invoker.invoke(f32, 0xA5B769058763E497, .{name, point}); } // 0xA5B769058763E497 0xE8422AC4 b323
@@ -14468,6 +14473,7 @@ pub const Task = struct
     pub inline fn getVehicleWaypointProgress(vehicle: types.Vehicle) c_int { return invoker.invoke(c_int, 0x9824CFF8FC66E159, .{vehicle}); } // 0x9824CFF8FC66E159 0xD3CCF64E b323
     pub inline fn getVehicleWaypointTargetPoint(vehicle: types.Vehicle) c_int { return invoker.invoke(c_int, 0x416B62AC8B9E5BBD, .{vehicle}); } // 0x416B62AC8B9E5BBD 0x81049608 b323
     pub inline fn vehicleWaypointPlaybackPause(vehicle: types.Vehicle) void { invoker.invoke(void, 0x8A4E6AC373666BC5, .{vehicle}); } // 0x8A4E6AC373666BC5 0x7C00B415 b323
+    pub inline fn vehicleWaypointPlaybackGetIsPaused(vehicle: types.Vehicle) windows.BOOL { return invoker.invoke(windows.BOOL, 0xE435D3539EFDCD1B, .{vehicle}); } // 0xE435D3539EFDCD1B  b3570
     pub inline fn vehicleWaypointPlaybackResume(vehicle: types.Vehicle) void { invoker.invoke(void, 0xDC04FCAA7839D492, .{vehicle}); } // 0xDC04FCAA7839D492 0xBEB14C82 b323
     pub inline fn vehicleWaypointPlaybackUseDefaultSpeed(vehicle: types.Vehicle) void { invoker.invoke(void, 0x5CEB25A7D2848963, .{vehicle}); } // 0x5CEB25A7D2848963 0x923C3AA4 b323
     pub inline fn vehicleWaypointPlaybackOverrideSpeed(vehicle: types.Vehicle, speed: f32) void { invoker.invoke(void, 0x121F0593E0A431D7, .{vehicle, speed}); } // 0x121F0593E0A431D7 0xBE1E7BB4 b323
@@ -14515,6 +14521,7 @@ pub const Task = struct
     /// Doesn't actually return anything.
     pub inline fn setTaskMoveNetworkEnableCollisionOnNetworkCloneWhenFixed(ped: types.Ped, enable: windows.BOOL) windows.BOOL { return invoker.invoke(windows.BOOL, 0x0FFB3C758E8C07B9, .{ped, enable}); } // 0x0FFB3C758E8C07B9  b2060
     pub inline fn setScriptTaskEnableCollisionOnNetworkCloneWhenFixed_(ped: types.Ped, enable: windows.BOOL) void { invoker.invoke(void, 0x32F6EEF031F943DC, .{ped, enable}); } // 0x32F6EEF031F943DC  b3095
+    pub inline fn setAmbientPedEnableCollisionOnNetworkCloneWhenFixed_(ped: types.Ped, enable: windows.BOOL) void { invoker.invoke(void, 0x0EFE4834A2F40563, .{ped, enable}); } // 0x0EFE4834A2F40563  b3570
     pub inline fn isMoveBlendRatioStill(ped: types.Ped) windows.BOOL { return invoker.invoke(windows.BOOL, 0x349CE7B56DAFD95C, .{ped}); } // 0x349CE7B56DAFD95C 0xE9DAF877 b323
     pub inline fn isMoveBlendRatioWalking(ped: types.Ped) windows.BOOL { return invoker.invoke(windows.BOOL, 0xF133BBBE91E1691F, .{ped}); } // 0xF133BBBE91E1691F 0xD21639A8 b323
     pub inline fn isMoveBlendRatioRunning(ped: types.Ped) windows.BOOL { return invoker.invoke(windows.BOOL, 0xD4D8636C0199A939, .{ped}); } // 0xD4D8636C0199A939 0xE76A2353 b323
@@ -14523,7 +14530,6 @@ pub const Task = struct
     pub inline fn isPedWalking(ped: types.Ped) windows.BOOL { return invoker.invoke(windows.BOOL, 0xDE4C184B2B9B071A, .{ped}); } // 0xDE4C184B2B9B071A 0x4B865C4A b323
     pub inline fn isPedRunning(ped: types.Ped) windows.BOOL { return invoker.invoke(windows.BOOL, 0xC5286FFC176F28A2, .{ped}); } // 0xC5286FFC176F28A2 0xE9A5578F b323
     pub inline fn isPedSprinting(ped: types.Ped) windows.BOOL { return invoker.invoke(windows.BOOL, 0x57E457CD2C0FC168, .{ped}); } // 0x57E457CD2C0FC168 0x4F3E0633 b323
-    /// What's strafing?
     pub inline fn isPedStrafing(ped: types.Ped) windows.BOOL { return invoker.invoke(windows.BOOL, 0xE45B7F222DE47E09, .{ped}); } // 0xE45B7F222DE47E09 0xEFEED13C b323
     ///  TASK::TASK_SYNCHRONIZED_SCENE(ped, scene, "creatures@rottweiler@in_vehicle@std_car", "get_in", 1000.0, -8.0, 4, 0, 0x447a0000, 0);
     /// 
@@ -14574,6 +14580,7 @@ pub const Vehicle = struct
     /// Deletes the specified vehicle, then sets the handle pointed to by the pointer to NULL.
     pub inline fn deleteVehicle(vehicle: [*c]types.Vehicle) void { invoker.invoke(void, 0xEA386986E786A54F, .{vehicle}); } // 0xEA386986E786A54F 0x9803AF60 b323
     pub inline fn setVehicleAllowHomingMissleLockon(vehicle: types.Vehicle, toggle: windows.BOOL, p_2: windows.BOOL) void { invoker.invoke(void, 0x7D6F9A3EF26136A0, .{vehicle, toggle, p_2}); } // 0x7D6F9A3EF26136A0 0xBB54ECCA b323
+    pub inline fn getVehicleAllowHomingMissleLockonSynced_(vehicle: types.Vehicle) windows.BOOL { return invoker.invoke(windows.BOOL, 0x613A431BCD5A22EB, .{vehicle}); } // 0x613A431BCD5A22EB  b3717
     pub inline fn setVehicleAllowHomingMissleLockonSynced(vehicle: types.Vehicle, can_be_locked_on: windows.BOOL, p_2: windows.BOOL) void { invoker.invoke(void, 0x1DDA078D12879EEE, .{vehicle, can_be_locked_on, p_2}); } // 0x1DDA078D12879EEE  b463
     /// Makes the vehicle accept no passengers.
     pub inline fn setVehicleAllowNoPassengersLockon(veh: types.Vehicle, toggle: windows.BOOL) void { invoker.invoke(void, 0x5D14D4154BFE7B2C, .{veh, toggle}); } // 0x5D14D4154BFE7B2C 0x8BAAC437 b323
@@ -15183,6 +15190,8 @@ pub const Vehicle = struct
     pub inline fn getClosestVehicle(vec: types.Vector3, radius: f32, model_hash: types.Hash, flags: c_int) types.Vehicle { return invoker.invoke(types.Vehicle, 0xF73EB622C4F1689B, .{vec.x, vec.y, vec.z, radius, model_hash, flags}); } // 0xF73EB622C4F1689B 0xD7E26B2C b323
     /// Corrected p1. it's basically the 'carriage/trailer number'. So if the train has 3 trailers you'd call the native once with a var or 3 times with 1, 2, 3.
     pub inline fn getTrainCarriage(train: types.Vehicle, trailer_number: c_int) types.Vehicle { return invoker.invoke(types.Vehicle, 0x08AAFD0814722BC3, .{train, trailer_number}); } // 0x08AAFD0814722BC3 0x2544E7A6 b323
+    pub inline fn setMakeTrainScanForBlockingEntities_(train: types.Vehicle, toggle: windows.BOOL) void { invoker.invoke(void, 0x559B6073DB7FFFF9, .{train, toggle}); } // 0x559B6073DB7FFFF9  b3717
+    pub inline fn getMissionTrainConfigIndexByName_(name: [*c]const u8) c_int { return invoker.invoke(c_int, 0x7DFAD92A34F09C00, .{name}); } // 0x7DFAD92A34F09C00  b3717
     pub inline fn isMissionTrain(train: types.Vehicle) windows.BOOL { return invoker.invoke(windows.BOOL, 0xAD464F2E18836BFC, .{train}); } // 0xAD464F2E18836BFC  b2372
     pub inline fn deleteMissionTrain(train: [*c]types.Vehicle) void { invoker.invoke(void, 0x5B76B14AE875C795, .{train}); } // 0x5B76B14AE875C795 0x86C9497D b323
     /// p1 is always 0
@@ -15202,8 +15211,6 @@ pub const Vehicle = struct
     pub inline fn isThisModelAnAmphibiousCar(model: types.Hash) windows.BOOL { return invoker.invoke(windows.BOOL, 0x633F6F44A537EBB6, .{model}); } // 0x633F6F44A537EBB6  b944
     pub inline fn isThisModelAnAmphibiousQuadbike(model: types.Hash) windows.BOOL { return invoker.invoke(windows.BOOL, 0xA1A9FC1C76A6730D, .{model}); } // 0xA1A9FC1C76A6730D  b1103
     /// Equivalent of SET_HELI_BLADES_SPEED(vehicleHandle, 1.0f);
-    /// 
-    /// this native works on planes to?
     pub inline fn setHeliBladesFullSpeed(vehicle: types.Vehicle) void { invoker.invoke(void, 0xA178472EBB8AE60D, .{vehicle}); } // 0xA178472EBB8AE60D 0x033A9408 b323
     /// Sets the speed of the helicopter blades in percentage of the full speed.
     /// 
@@ -15233,8 +15240,6 @@ pub const Vehicle = struct
     /// value: true to turn the vehicle on; false to turn it off. \
     /// instantly: if true, the vehicle will be set to the state immediately; otherwise, the current driver will physically turn on or off the engine. \
     /// disableAutoStart: If true, the system will prevent the engine from starting when the player got into it.
-    /// 
-    /// from what I've tested when I do this to a helicopter the propellers turn off after the engine has started. so is there any way to keep the heli propellers on?
     pub inline fn setVehicleEngineOn(vehicle: types.Vehicle, value: windows.BOOL, instantly: windows.BOOL, disable_auto_start: windows.BOOL) void { invoker.invoke(void, 0x2497C4717C8B881E, .{vehicle, value, instantly, disable_auto_start}); } // 0x2497C4717C8B881E 0x7FBC86F1 b323
     pub inline fn setVehicleUndriveable(vehicle: types.Vehicle, toggle: windows.BOOL) void { invoker.invoke(void, 0x8ABA6AF54B942B95, .{vehicle, toggle}); } // 0x8ABA6AF54B942B95 0x48D02A4E b323
     pub inline fn setVehicleProvidesCover(vehicle: types.Vehicle, toggle: windows.BOOL) void { invoker.invoke(void, 0x5AFEEDD9BB2899D7, .{vehicle, toggle}); } // 0x5AFEEDD9BB2899D7 0xEFC01CA9 b323
@@ -15666,6 +15671,7 @@ pub const Vehicle = struct
     /// vehicle must be a plane
     pub inline fn setVehicleUsesLargeRearRamp(vehicle: types.Vehicle, toggle: windows.BOOL) void { invoker.invoke(void, 0xCAC66558B944DA67, .{vehicle, toggle}); } // 0xCAC66558B944DA67 0x0B200CE2 b323
     pub inline fn setVehicleRudderBroken(vehicle: types.Vehicle, toggle: windows.BOOL) void { invoker.invoke(void, 0x09606148B6C71DEF, .{vehicle, toggle}); } // 0x09606148B6C71DEF 0x3FAC3CD4 b323
+    pub inline fn setVehicleTailBroken(vehicle: types.Vehicle, toggle: windows.BOOL) void { invoker.invoke(void, 0x6CB5B84B78AC55FE, .{vehicle, toggle}); } // 0x6CB5B84B78AC55FE  b3717
     pub inline fn setConvertibleRoofLatchState(vehicle: types.Vehicle, state: windows.BOOL) void { invoker.invoke(void, 0x1A78AD3D8240536F, .{vehicle, state}); } // 0x1A78AD3D8240536F 0x0858678C b323
     pub inline fn getVehicleEstimatedMaxSpeed(vehicle: types.Vehicle) f32 { return invoker.invoke(f32, 0x53AF99BAA671CA47, .{vehicle}); } // 0x53AF99BAA671CA47 0x7D1A0616 b323
     pub inline fn getVehicleMaxBraking(vehicle: types.Vehicle) f32 { return invoker.invoke(f32, 0xAD7E85FC227197C4, .{vehicle}); } // 0xAD7E85FC227197C4 0x03B926F6 b323
