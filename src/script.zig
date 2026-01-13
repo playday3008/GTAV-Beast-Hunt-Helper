@@ -23,7 +23,7 @@ var g_offset: struct {
 } = undefined;
 
 var g: struct {
-    iSPInitBitset: *packed struct {
+    iSPInitBitset: *packed struct(u64) {
         INSTALL_SCREEN_FINISHED: bool,
         TITLE_SEQUENCE_DISPLAYED: bool,
         TURN_ON_LOST_BIKER_GROUP: bool,
@@ -146,6 +146,107 @@ var g: struct {
     },
 } = undefined;
 
+extern "user32" fn MessageBoxA(
+    hWnd: ?w.HWND,
+    lpText: ?w.LPCSTR,
+    lpCaption: ?w.LPCSTR,
+    uType: packed struct(w.UINT) {
+        /// Bits 0-3: Button type
+        button_type: enum(u4) {
+            /// MB_OK
+            ok = 0x0,
+            /// MB_OKCANCEL
+            ok_cancel = 0x1,
+            /// MB_ABORTRETRYIGNORE
+            abort_retry_ignore = 0x2,
+            /// MB_YESNOCANCEL
+            yes_no_cancel = 0x3,
+            /// MB_YESNO
+            yes_no = 0x4,
+            /// MB_RETRYCANCEL
+            retry_cancel = 0x5,
+            /// MB_CANCELTRYCONTINUE
+            cancel_try_continue = 0x6,
+            _,
+        } = .ok,
+
+        /// Bits 4-7: Icon type
+        icon_type: enum(u4) {
+            none = 0x0,
+            /// MB_ICONSTOP / MB_ICONERROR / MB_ICONHAND (0x10)
+            stop = 0x1,
+            /// MB_ICONQUESTION (0x20)
+            question = 0x2,
+            /// MB_ICONEXCLAMATION / MB_ICONWARNING (0x30)
+            exclamation = 0x3,
+            /// MB_ICONINFORMATION / MB_ICONASTERISK (0x40)
+            information = 0x4,
+            _,
+        } = .none,
+
+        /// Bits 8-11: Default button
+        default_button: enum(u4) {
+            /// MB_DEFBUTTON1
+            button1 = 0x0,
+            /// MB_DEFBUTTON2
+            button2 = 0x1,
+            /// MB_DEFBUTTON3
+            button3 = 0x2,
+            /// MB_DEFBUTTON4
+            button4 = 0x3,
+            _,
+        } = .button1,
+
+        /// Bits 12-13: Modality
+        modality: enum(u2) {
+            /// MB_APPLMODAL
+            application = 0x0,
+            /// MB_SYSTEMMODAL
+            system = 0x1,
+            /// MB_TASKMODAL
+            task = 0x2,
+            _,
+        } = .application,
+
+        /// Bit 14: MB_HELP (0x4000)
+        help: bool = false,
+
+        /// Bit 15: Reserved
+        _reserved1: u1 = 0,
+
+        /// Bit 16: MB_SETFOREGROUND (0x10000)
+        set_foreground: bool = false,
+
+        /// Bit 17: MB_DEFAULT_DESKTOP_ONLY (0x20000)
+        default_desktop_only: bool = false,
+
+        /// Bit 18: MB_TOPMOST (0x40000)
+        topmost: bool = false,
+
+        /// Bit 19: MB_RIGHT (0x80000)
+        right: bool = false,
+
+        /// Bit 20: MB_RTLREADING (0x100000)
+        rtl_reading: bool = false,
+
+        /// Bit 21: MB_SERVICE_NOTIFICATION (0x200000)
+        service_notification: bool = false,
+
+        /// Bits 22-31: Reserved
+        _reserved2: u10 = 0,
+
+        /// Convert to raw UINT value for Windows API
+        pub fn toUint(self: @This()) w.UINT {
+            return @bitCast(self);
+        }
+
+        /// Create from raw UINT value
+        pub fn fromUint(value: w.UINT) @This() {
+            return @bitCast(value);
+        }
+    },
+) callconv(.winapi) c_int;
+
 pub fn scriptMain() callconv(.c) void {
     g_offset = switch (Hook.getGameVersionGTAV()) {
         // Legacy
@@ -257,8 +358,19 @@ pub fn scriptMain() callconv(.c) void {
             .sBHPath = 111119 + 463 + 266,
         },
         else => |version| {
-            log.err("Unsupported game version: {any}", .{
-                version,
+            // TODO: Scan globals for known values to auto-detect offsets
+            const allocator = std.heap.page_allocator;
+            var text: std.ArrayList(u8) = .empty;
+            defer text.deinit(allocator);
+            text.print(
+                allocator,
+                "Unsupported game version '{any}', the script will exit. Contact the script author for support.",
+                .{version},
+            ) catch unreachable;
+            text.append(allocator, 0) catch unreachable;
+            log.err("{s}", .{text.items[0.. :0]});
+            _ = MessageBoxA(null, text.items[0.. :0], "Error", .{
+                .icon_type = .stop,
             });
             return;
         },
