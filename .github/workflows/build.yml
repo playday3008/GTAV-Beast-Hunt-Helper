@@ -1,0 +1,31 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v6
+
+    - name: Setup Zig
+      uses: mlugg/setup-zig@v2
+      with:
+        version: 0.15.1
+
+    - name: Build project
+      run: zig build
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v6
+      with:
+        name: BeastHuntHelper-${{ github.sha }}
+        path: zig-out/bin/BeastHuntHelper.dll
+        if-no-files-found: error
