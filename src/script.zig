@@ -378,16 +378,15 @@ pub fn scriptMain() callconv(.c) void {
         else => |version| {
             // TODO: Scan globals for known values to auto-detect offsets
             const allocator = std.heap.page_allocator;
-            var text: std.ArrayList(u8) = .empty;
-            defer text.deinit(allocator);
-            text.print(
+            const text = std.fmt.allocPrintSentinel(
                 allocator,
                 "Unsupported game version '{any}', the script will exit. Contact the script author for support.",
                 .{version},
+                0,
             ) catch unreachable;
-            text.append(allocator, 0) catch unreachable;
-            log.err("{s}", .{text.items[0.. :0]});
-            _ = MessageBoxA(null, text.items[0.. :0], "Error", .{
+            defer allocator.free(text);
+            log.err("{s}", .{text});
+            _ = MessageBoxA(null, text, "Error", .{
                 .icon_type = .stop,
             });
             return;
