@@ -21,7 +21,7 @@ jobs:
         version: 0.15.1
 
     - name: Build project
-      run: zig build
+      run: zig build --release=fast
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v6
