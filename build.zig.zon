@@ -66,8 +66,8 @@
         //    .lazy = false,
         //},
         .ScriptHookZig = .{
-            .url = "git+https://github.com/playday3008/ScriptHookZig.git#55458555f3feb11ec52eba97d07dfc21900fdba2",
-            .hash = "ScriptHookZig-0.0.0-3e3FLgIAAQAha4YNui3gyqnMCJ74GWnoeFrxfFoG-TRZ",
+            .url = "git+https://github.com/playday3008/ScriptHookZig.git#becf8ca1af5985345de6211745abe8a7c19cb35c",
+            .hash = "ScriptHookZig-0.0.0-3e3FLqAJAQCqIkOuQtLW4LTvQO9Jl4IxR3XqHo0LRQhC",
         },
     },
 

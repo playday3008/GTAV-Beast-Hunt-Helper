@@ -39,10 +39,16 @@ pub fn DllMain(
     switch (reason) {
         .PROCESS_ATTACH => {
             console_thread = std.Thread.spawn(.{}, allocConsole, .{}) catch null;
-            Hook.scriptRegister(@ptrCast(hinstDLL), script.scriptMain);
+            Hook.scriptRegister(@ptrCast(hinstDLL), script.scriptMain) catch |err| {
+                std.debug.print("Failed to register script due to: {t}\n", .{err});
+                return windows.FALSE;
+            };
         },
         .PROCESS_DETACH => {
-            Hook.scriptUnregister(@ptrCast(hinstDLL));
+            Hook.scriptUnregister(@ptrCast(hinstDLL)) catch |err| {
+                std.debug.print("Failed to unregister script due to: {t}\n", .{err});
+                return windows.FALSE;
+            };
             if (console_thread) |thread| {
                 _ = FreeConsole();
                 thread.join();

@@ -248,7 +248,18 @@ extern "user32" fn MessageBoxA(
 ) callconv(.winapi) c_int;
 
 pub fn scriptMain() callconv(.c) void {
-    g_offset = switch (Hook.getGameVersionGTAV()) {
+    main() catch |err| {
+        log.err("Script terminated due to: {t}", .{err});
+    };
+}
+
+fn main() Hook.Error!void {
+    const gameVersion = Hook.getGameVersionGTAV() catch |err| {
+        log.err("Failed to get game version due to: {t}", .{err});
+        return;
+    };
+
+    g_offset = switch (gameVersion) {
         // Legacy
         // Sources:
         // - https://github.com/calamity-inc/GTA-V-Decompiled-Scripts
@@ -395,13 +406,13 @@ pub fn scriptMain() callconv(.c) void {
 
     g = .{
         // Get current Single Player bitset
-        .iSPInitBitset = @ptrCast(Hook.getGlobalPtr(g_offset.iSPInitBitset)),
+        .iSPInitBitset = @ptrCast(try Hook.getGlobalPtr(g_offset.iSPInitBitset)),
         // Get current Beast Hunt checkpoints
-        .vBHCheckpoints = @ptrCast(Hook.getGlobalPtr(g_offset.vBHCheckpoints)),
+        .vBHCheckpoints = @ptrCast(try Hook.getGlobalPtr(g_offset.vBHCheckpoints)),
         // Get current Beast Hunt path indexes
-        .iBHPathIndexes = @ptrCast(Hook.getGlobalPtr(g_offset.iBHPathIndexes)),
+        .iBHPathIndexes = @ptrCast(try Hook.getGlobalPtr(g_offset.iBHPathIndexes)),
         // Get current Beast Hunt path nodes
-        .sBHPath = @ptrCast(Hook.getGlobalPtr(g_offset.sBHPath)),
+        .sBHPath = @ptrCast(try Hook.getGlobalPtr(g_offset.sBHPath)),
     };
 
     // Reset visited paths nodes
@@ -411,8 +422,8 @@ pub fn scriptMain() callconv(.c) void {
     dumpGlobals();
 
     while (true) {
-        update();
-        Hook.wait(0);
+        try update();
+        try Hook.wait(0);
     }
 }
 
@@ -420,12 +431,12 @@ pub fn scriptMain() callconv(.c) void {
 // path between checkpoints but not the checkpoints themselves.
 var visitedPathsNodes: [MAX_PATH_COUNT][NODES_PER_PATH]?bool = undefined;
 
-fn update() void {
+fn update() Hook.Error!void {
     // Get player ped and position
-    const player = Natives.Player.playerId();
-    const playerPed = Natives.Player.playerPedId();
-    const playerModel = Natives.Entity.getEntityModel(playerPed);
-    const playerPos = Natives.Entity.getEntityCoords(playerPed, w.TRUE);
+    const player = try Natives.Player.playerId();
+    const playerPed = try Natives.Player.playerPedId();
+    const playerModel = try Natives.Entity.getEntityModel(playerPed);
+    const playerPos = try Natives.Entity.getEntityCoords(playerPed, w.TRUE);
 
     if (!g.iSPInitBitset.BEAST_PEYOTES_COLLECTED or
         g.iSPInitBitset.BEAST_HUNT_COMPLETED or
@@ -438,8 +449,8 @@ fn update() void {
     }
 
     // Check if player ped exists and control is on (e.g. not in a cutscene)
-    if (Natives.Entity.doesEntityExist(playerPed) == w.FALSE or
-        Natives.Player.isPlayerControlOn(player) == w.FALSE)
+    if (try Natives.Entity.doesEntityExist(playerPed) == w.FALSE or
+        try Natives.Player.isPlayerControlOn(player) == w.FALSE)
     {
         return;
     }
@@ -459,7 +470,7 @@ fn update() void {
         // through all nodes
         {
             // Current checkpoint to first node
-            Natives.Graphics.drawLine(
+            try Natives.Graphics.drawLine(
                 g.vBHCheckpoints.data[g.iSPInitBitset.BEAST_CURRENT_CHECKPOINT],
                 path.nodes[0],
                 255,
@@ -469,7 +480,7 @@ fn update() void {
             );
 
             // Last node to next checkpoint
-            Natives.Graphics.drawLine(
+            try Natives.Graphics.drawLine(
                 path.nodes[path.length - 1],
                 g.vBHCheckpoints.data[g.iSPInitBitset.BEAST_NEXT_CHECKPOINT],
                 255,
@@ -483,7 +494,7 @@ fn update() void {
                 const node1 = path.nodes[i];
                 const node2 = path.nodes[i + 1];
 
-                Natives.Graphics.drawLine(
+                try Natives.Graphics.drawLine(
                     node1,
                     node2,
                     0,
@@ -494,7 +505,7 @@ fn update() void {
             }
 
             // Next checkpoint marker
-            Natives.Graphics.drawMarker(
+            try Natives.Graphics.drawMarker(
                 28,
                 g.vBHCheckpoints.data[g.iSPInitBitset.BEAST_NEXT_CHECKPOINT],
                 .{
@@ -526,7 +537,7 @@ fn update() void {
             );
 
             // Draw line from player to next checkpoint
-            Natives.Graphics.drawLine(
+            try Natives.Graphics.drawLine(
                 playerPos,
                 g.vBHCheckpoints.data[g.iSPInitBitset.BEAST_NEXT_CHECKPOINT],
                 255,
@@ -545,7 +556,7 @@ fn update() void {
                     if (!visited) {
 
                         // Mark node as visited when player is close enough
-                        const dist = Natives.Builtin.vdist2(playerPos, node);
+                        const dist = try Natives.Builtin.vdist2(playerPos, node);
                         if (dist < PATH_NODE_RADIUS) // Tight radius check, just to be sure
                         {
                             visitedNodes[i] = true;
@@ -556,7 +567,7 @@ fn update() void {
                         }
 
                         // Draw sphere to first unvisited node
-                        Natives.Graphics.drawMarkerSphere(
+                        try Natives.Graphics.drawMarkerSphere(
                             node,
                             comptime std.math.sqrt(PATH_NODE_RADIUS),
                             0,
@@ -566,7 +577,7 @@ fn update() void {
                         );
 
                         // Draw line to first unvisited node
-                        Natives.Graphics.drawLine(
+                        try Natives.Graphics.drawLine(
                             playerPos,
                             node,
                             0,
