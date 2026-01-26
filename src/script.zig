@@ -9,6 +9,8 @@ const Types = ScriptHookZig.Types;
 const Joaat = ScriptHookZig.Joaat;
 const Natives = @import("natives.zig");
 
+const root = @import("root");
+
 // Constants
 const CHECKPOINT_COUNT = 11;
 const MAX_PATH_COUNT = 64;
@@ -146,118 +148,23 @@ var g: struct {
     },
 } = undefined;
 
-extern "user32" fn MessageBoxA(
-    hWnd: ?w.HWND,
-    lpText: ?w.LPCSTR,
-    lpCaption: ?w.LPCSTR,
-    uType: packed struct(w.UINT) {
-        /// Bits 0-3: Button type
-        button_type: enum(u4) {
-            /// MB_OK
-            ok = 0x0,
-            /// MB_OKCANCEL
-            ok_cancel = 0x1,
-            /// MB_ABORTRETRYIGNORE
-            abort_retry_ignore = 0x2,
-            /// MB_YESNOCANCEL
-            yes_no_cancel = 0x3,
-            /// MB_YESNO
-            yes_no = 0x4,
-            /// MB_RETRYCANCEL
-            retry_cancel = 0x5,
-            /// MB_CANCELTRYCONTINUE
-            cancel_try_continue = 0x6,
-            _,
-        } = .ok,
-
-        /// Bits 4-7: Icon type
-        icon_type: enum(u4) {
-            none = 0x0,
-            /// MB_ICONSTOP / MB_ICONERROR / MB_ICONHAND (0x10)
-            stop = 0x1,
-            /// MB_ICONQUESTION (0x20)
-            question = 0x2,
-            /// MB_ICONEXCLAMATION / MB_ICONWARNING (0x30)
-            exclamation = 0x3,
-            /// MB_ICONINFORMATION / MB_ICONASTERISK (0x40)
-            information = 0x4,
-            _,
-        } = .none,
-
-        /// Bits 8-11: Default button
-        default_button: enum(u4) {
-            /// MB_DEFBUTTON1
-            button1 = 0x0,
-            /// MB_DEFBUTTON2
-            button2 = 0x1,
-            /// MB_DEFBUTTON3
-            button3 = 0x2,
-            /// MB_DEFBUTTON4
-            button4 = 0x3,
-            _,
-        } = .button1,
-
-        /// Bits 12-13: Modality
-        modality: enum(u2) {
-            /// MB_APPLMODAL
-            application = 0x0,
-            /// MB_SYSTEMMODAL
-            system = 0x1,
-            /// MB_TASKMODAL
-            task = 0x2,
-            _,
-        } = .application,
-
-        /// Bit 14: MB_HELP (0x4000)
-        help: bool = false,
-
-        /// Bit 15: Reserved
-        _reserved1: u1 = 0,
-
-        /// Bit 16: MB_SETFOREGROUND (0x10000)
-        set_foreground: bool = false,
-
-        /// Bit 17: MB_DEFAULT_DESKTOP_ONLY (0x20000)
-        default_desktop_only: bool = false,
-
-        /// Bit 18: MB_TOPMOST (0x40000)
-        topmost: bool = false,
-
-        /// Bit 19: MB_RIGHT (0x80000)
-        right: bool = false,
-
-        /// Bit 20: MB_RTLREADING (0x100000)
-        rtl_reading: bool = false,
-
-        /// Bit 21: MB_SERVICE_NOTIFICATION (0x200000)
-        service_notification: bool = false,
-
-        /// Bits 22-31: Reserved
-        _reserved2: u10 = 0,
-
-        /// Convert to raw UINT value for Windows API
-        pub fn toUint(self: @This()) w.UINT {
-            return @bitCast(self);
-        }
-
-        /// Create from raw UINT value
-        pub fn fromUint(value: w.UINT) @This() {
-            return @bitCast(value);
-        }
-    },
-) callconv(.winapi) c_int;
-
 pub fn scriptMain() callconv(.c) void {
+    log.debug("Script entry point called", .{});
     main() catch |err| {
-        log.err("Script terminated due to: {t}", .{err});
+        log.err("Script terminated due to error: {t}", .{err});
+        log.info("Script will now exit", .{});
     };
 }
 
 fn main() Hook.Error!void {
+    log.debug("Script starting...", .{});
+
     const gameVersion = Hook.getGameVersionGTAV() catch |err| {
         log.err("Failed to get game version due to: {t}", .{err});
         return;
     };
+
+    log.info("Detected game version: {t}", .{gameVersion});
 
     g_offset = switch (gameVersion) {
         // Legacy
@@ -397,12 +304,18 @@ fn main() Hook.Error!void {
             ) catch unreachable;
             defer allocator.free(text);
             log.err("{s}", .{text});
-            _ = MessageBoxA(null, text, "Error", .{
+            _ = root.MessageBoxA(null, text, "Error", .{
                 .icon_type = .stop,
             });
             return;
         },
     };
+
+    log.debug("Setting up global pointers with offsets:", .{});
+    log.debug("\tiSPInitBitset  = {d}", .{g_offset.iSPInitBitset});
+    log.debug("\tvBHCheckpoints = {d}", .{g_offset.vBHCheckpoints});
+    log.debug("\tiBHPathIndexes = {d}", .{g_offset.iBHPathIndexes});
+    log.debug("\tsBHPath        = {d}", .{g_offset.sBHPath});
 
     g = .{
         // Get current Single Player bitset
@@ -415,12 +328,17 @@ fn main() Hook.Error!void {
         .sBHPath = @ptrCast(try Hook.getGlobalPtr(g_offset.sBHPath)),
     };
 
+    log.debug("Global pointers initialized successfully", .{});
+
     // Reset visited paths nodes
+    log.info("Resetting visited paths nodes...", .{});
     resetVisited();
 
     // Print globals for debugging
+    log.debug("Dumping globals for debugging...", .{});
     dumpGlobals();
 
+    log.debug("Entering main update loop", .{});
     while (true) {
         try update();
         try Hook.wait(0);
@@ -431,12 +349,50 @@ fn main() Hook.Error!void {
 // path between checkpoints but not the checkpoints themselves.
 var visitedPathsNodes: [MAX_PATH_COUNT][NODES_PER_PATH]?bool = undefined;
 
+// Track previous state to log only on changes
+var prevBeastState: struct {
+    peyotesCollected: bool = false,
+    huntCompleted: bool = false,
+    killedAndUnlocked: bool = false,
+    lastPeyoteDay: u3 = 0,
+    currentCheckpoint: u4 = 0,
+    nextCheckpoint: u4 = 0,
+    callMade: bool = false,
+} = .{};
+
 fn update() Hook.Error!void {
     // Get player ped and position
     const player = try Natives.Player.playerId();
     const playerPed = try Natives.Player.playerPedId();
     const playerModel = try Natives.Entity.getEntityModel(playerPed);
     const playerPos = try Natives.Entity.getEntityCoords(playerPed, w.TRUE);
+
+    // Log state changes
+    if (prevBeastState.peyotesCollected != g.iSPInitBitset.BEAST_PEYOTES_COLLECTED) {
+        log.info("State change: BEAST_PEYOTES_COLLECTED: {any} -> {any}", .{ prevBeastState.peyotesCollected, g.iSPInitBitset.BEAST_PEYOTES_COLLECTED });
+        prevBeastState.peyotesCollected = g.iSPInitBitset.BEAST_PEYOTES_COLLECTED;
+    }
+    if (prevBeastState.huntCompleted != g.iSPInitBitset.BEAST_HUNT_COMPLETED) {
+        log.info("State change: BEAST_HUNT_COMPLETED: {any} -> {any}", .{ prevBeastState.huntCompleted, g.iSPInitBitset.BEAST_HUNT_COMPLETED });
+        prevBeastState.huntCompleted = g.iSPInitBitset.BEAST_HUNT_COMPLETED;
+    }
+    if (prevBeastState.killedAndUnlocked != g.iSPInitBitset.BEAST_KILLED_AND_UNLOCKED) {
+        log.info("State change: BEAST_KILLED_AND_UNLOCKED: {any} -> {any}", .{ prevBeastState.killedAndUnlocked, g.iSPInitBitset.BEAST_KILLED_AND_UNLOCKED });
+        prevBeastState.killedAndUnlocked = g.iSPInitBitset.BEAST_KILLED_AND_UNLOCKED;
+    }
+    if (prevBeastState.lastPeyoteDay != g.iSPInitBitset.BEAST_LAST_PEYOTE_DAY) {
+        log.info("State change: BEAST_LAST_PEYOTE_DAY: {d} -> {d}", .{ prevBeastState.lastPeyoteDay, g.iSPInitBitset.BEAST_LAST_PEYOTE_DAY });
+        prevBeastState.lastPeyoteDay = g.iSPInitBitset.BEAST_LAST_PEYOTE_DAY;
+    }
+    if (prevBeastState.currentCheckpoint != g.iSPInitBitset.BEAST_CURRENT_CHECKPOINT) {
+        log.info("State change: BEAST_CURRENT_CHECKPOINT: {d} -> {d}", .{ prevBeastState.currentCheckpoint, g.iSPInitBitset.BEAST_CURRENT_CHECKPOINT });
+        prevBeastState.currentCheckpoint = g.iSPInitBitset.BEAST_CURRENT_CHECKPOINT;
+    }
+    if (prevBeastState.nextCheckpoint != g.iSPInitBitset.BEAST_NEXT_CHECKPOINT) {
+        log.info("State change: BEAST_NEXT_CHECKPOINT: {d} -> {d}", .{ prevBeastState.nextCheckpoint, g.iSPInitBitset.BEAST_NEXT_CHECKPOINT });
+        prevBeastState.nextCheckpoint = g.iSPInitBitset.BEAST_NEXT_CHECKPOINT;
+    }
+    // Omit callMade as it's handled below
 
     if (!g.iSPInitBitset.BEAST_PEYOTES_COLLECTED or
         g.iSPInitBitset.BEAST_HUNT_COMPLETED or
@@ -455,11 +411,23 @@ fn update() Hook.Error!void {
         return;
     }
 
+    // Make a call every time
+    if (prevBeastState.callMade != g.iSPInitBitset.BEAST_CALL_MADE) {
+        prevBeastState.callMade = g.iSPInitBitset.BEAST_CALL_MADE;
+        if (!g.iSPInitBitset.BEAST_CALL_MADE) {
+            g.iSPInitBitset.BEAST_CALL_MADE = true;
+        }
+    }
+
     // Path drawing and node visiting
     {
-        const pathIndex = g.iBHPathIndexes.data[g.iSPInitBitset.BEAST_CURRENT_CHECKPOINT].data[g.iSPInitBitset.BEAST_NEXT_CHECKPOINT];
+        const currentCP = g.iSPInitBitset.BEAST_CURRENT_CHECKPOINT;
+        const nextCP = g.iSPInitBitset.BEAST_NEXT_CHECKPOINT;
+        const pathIndex = g.iBHPathIndexes.data[currentCP].data[nextCP];
+
         // Path index can be -1 if there's no valid path between checkpoints
         if (pathIndex < 0 or pathIndex >= MAX_PATH_COUNT) {
+            log.warn("Invalid path index {d} between checkpoints {d} and {d}", .{ pathIndex, currentCP, nextCP });
             return;
         }
         const index: usize = @intCast(pathIndex);
@@ -469,9 +437,12 @@ fn update() Hook.Error!void {
         // Draw path from current to next checkpoint
         // through all nodes
         {
+            const currentCheckpointPos = g.vBHCheckpoints.data[currentCP];
+            const nextCheckpointPos = g.vBHCheckpoints.data[nextCP];
+
             // Current checkpoint to first node
             try Natives.Graphics.drawLine(
-                g.vBHCheckpoints.data[g.iSPInitBitset.BEAST_CURRENT_CHECKPOINT],
+                currentCheckpointPos,
                 path.nodes[0],
                 255,
                 255,
@@ -482,7 +453,7 @@ fn update() Hook.Error!void {
             // Last node to next checkpoint
             try Natives.Graphics.drawLine(
                 path.nodes[path.length - 1],
-                g.vBHCheckpoints.data[g.iSPInitBitset.BEAST_NEXT_CHECKPOINT],
+                nextCheckpointPos,
                 255,
                 0,
                 0,
@@ -507,7 +478,7 @@ fn update() Hook.Error!void {
             // Next checkpoint marker
             try Natives.Graphics.drawMarker(
                 28,
-                g.vBHCheckpoints.data[g.iSPInitBitset.BEAST_NEXT_CHECKPOINT],
+                nextCheckpointPos,
                 .{
                     .x = 0,
                     .y = 0,
@@ -539,7 +510,7 @@ fn update() Hook.Error!void {
             // Draw line from player to next checkpoint
             try Natives.Graphics.drawLine(
                 playerPos,
-                g.vBHCheckpoints.data[g.iSPInitBitset.BEAST_NEXT_CHECKPOINT],
+                nextCheckpointPos,
                 255,
                 255 / 2,
                 0,
@@ -549,6 +520,14 @@ fn update() Hook.Error!void {
 
         // Draw line and sphere to first unvisited node
         {
+            var visitedCount: usize = 0;
+            var unvisitedCount: usize = 0;
+            for (0..path.length) |j| {
+                if (visitedNodes[j]) |v| {
+                    if (v) visitedCount += 1 else unvisitedCount += 1;
+                }
+            }
+
             for (0..path.length) |i| {
                 const node = path.nodes[i];
 
@@ -561,8 +540,8 @@ fn update() Hook.Error!void {
                         {
                             visitedNodes[i] = true;
                             log.info(
-                                "Visited: ({d:>8.3}, {d:>8.3}, {d:>7.3})",
-                                .{ node.x, node.y, node.z },
+                                "Visited node {d} at ({d:>8.3}, {d:>8.3}, {d:>7.3}) - {d}/{d}",
+                                .{ i, node.x, node.y, node.z, visitedCount + 1, visitedCount + unvisitedCount },
                             );
                         }
 
@@ -611,6 +590,11 @@ fn resetVisited() void {
                 node.* = false;
             }
         }
+    }
+
+    // Reset call made state
+    if (g.iSPInitBitset.BEAST_CALL_MADE) {
+        g.iSPInitBitset.BEAST_CALL_MADE = false;
     }
 }
 
